@@ -30,6 +30,24 @@ export default function App() {
   // Initial URL-to-state (on mount only)
   React.useEffect(() => {
     const path = window.location.pathname.replace(/^\/+/g, '');
+    
+    // Handle Custom Redirect Links
+    if (path && path !== '' && path !== 'admin') {
+      const savedLinks = localStorage.getItem('joyfastfly_links');
+      if (savedLinks) {
+        try {
+          const links = JSON.parse(savedLinks);
+          const link = links.find((l: any) => l.slug === path || l.id === path);
+          if (link) {
+            window.location.href = link.url;
+            return; // Redirecting, stop further processing
+          }
+        } catch (e) {
+          console.error('Redirect failed');
+        }
+      }
+    }
+
     if (path === 'admin') {
       setSection('admin');
     } else if (['about', 'destinations', 'services', 'contact', 'news', 'stories'].includes(path)) {
