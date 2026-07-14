@@ -27,8 +27,8 @@ export default function App() {
   const [sharedPosts, setSharedPosts] = useState<NewsPost[]>(INITIAL_NEWS_POSTS);
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
 
+  // Initial URL-to-state (on mount only)
   React.useEffect(() => {
-    // Initial Route Handling
     const path = window.location.pathname.replace(/^\/+/g, '');
     if (path === 'admin') {
       setSection('admin');
@@ -37,7 +37,10 @@ export default function App() {
     } else {
       setSection('home');
     }
+  }, []);
 
+  // State-to-URL (when section changes)
+  React.useEffect(() => {
     // Scroll to top on section change
     window.scrollTo(0, 0);
 

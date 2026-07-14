@@ -81,9 +81,13 @@ interface CountryAdminItem {
 }
 
 export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, setSection }) => {
-  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(() => localStorage.getItem('admin_unlocked') === 'true');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('admin_unlocked', String(adminUnlocked));
+  }, [adminUnlocked]);
   
   // Left Sidebar active tab
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -745,6 +749,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
 
   const handleLogout = () => {
     setAdminUnlocked(false);
+    localStorage.removeItem('admin_unlocked');
     setAdminPassword('');
     setSection('home');
   };
@@ -1054,19 +1059,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                       </div>
                     </div>
 
-                    {/* STAT CARD 6: Total Links */}
-                    <div className="bg-white rounded-3xl p-5 border border-gray-150/80 shadow-xs flex items-center gap-4 text-left">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0">
-                        <LinkIcon size={22} />
-                      </div>
-                      <div className="leading-tight">
-                        <div className="text-xs font-black text-gray-400 uppercase tracking-wider">Total Links</div>
-                        <div className="text-2xl font-black text-blue-950 mt-1">{links.length}</div>
-                        <button onClick={() => setActiveTab('links')} className="text-[10px] font-black text-indigo-600 hover:underline mt-1.5 block uppercase tracking-wide">
-                          Manage links
-                        </button>
-                      </div>
-                    </div>
                   </div>
 
                   {/* 3-COLUMN CONTENT GRID */}
@@ -1156,42 +1148,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                       </button>
                     </div>
 
-                    {/* Quick Links Card */}
-                    <div className="bg-white rounded-3xl border border-gray-150/80 p-6 shadow-xs flex flex-col text-left">
-                      <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
-                        <h3 className="font-black text-blue-950 text-base">Quick Links</h3>
-                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                      </div>
-                      <div className="flex flex-col gap-4 flex-grow">
-                        {links.length === 0 ? (
-                          <div className="py-10 text-center text-gray-400 font-bold text-xs uppercase tracking-widest">No links found</div>
-                        ) : (
-                          links.slice(0, 4).map((link) => (
-                            <div key={link.id} className="flex items-center justify-between group">
-                              <div className="leading-tight">
-                                <div className="font-extrabold text-blue-950 text-sm truncate max-w-[150px]">{link.title}</div>
-                                <div className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{link.category}</div>
-                              </div>
-                              <a 
-                                href={link.url} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                              >
-                                <ExternalLink size={14} />
-                              </a>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                      <button 
-                        onClick={() => setActiveTab('links')}
-                        className="text-xs font-extrabold text-[#da1e28] hover:underline mt-6 flex items-center gap-1.5 w-fit"
-                      >
-                        Manage all links →
-                      </button>
-                    </div>
-
+                    
                   </div>
 
                 </div>
@@ -2812,7 +2769,7 @@ DELETE FROM inquiries;`);
               )}
 
               {/* TAB 7: LINKS */}
-              {activeTab === 'links' && (
+              {activeTab === 'false' && (
                 <div className="flex flex-col gap-6 animate-fade-in text-left">
                   <div className="flex items-center justify-between">
                     <div>
