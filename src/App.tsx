@@ -28,25 +28,40 @@ export default function App() {
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
 
   React.useEffect(() => {
-    window.scrollTo(0, 0);
-    
-    // Handle Custom Redirect Links
+    // Initial Route Handling
     const path = window.location.pathname.replace(/^\/+/g, '');
-    if (path && path !== '' && path !== 'admin') {
-      const savedLinks = localStorage.getItem('joyfastfly_links');
-      if (savedLinks) {
-        try {
-          const links = JSON.parse(savedLinks);
-          const link = links.find((l: any) => l.slug === path || l.id === path);
-          if (link) {
-            window.location.href = link.url;
-          }
-        } catch (e) {
-          console.error('Redirect failed');
-        }
-      }
+    if (path === 'admin') {
+      setSection('admin');
+    } else if (['about', 'destinations', 'services', 'contact', 'news', 'stories'].includes(path)) {
+      setSection(path);
+    } else {
+      setSection('home');
+    }
+
+    // Scroll to top on section change
+    window.scrollTo(0, 0);
+
+    // Update URL without reloading the page
+    const newPath = section === 'home' ? '/' : `/${section}`;
+    if (window.location.pathname !== newPath) {
+      window.history.pushState({ section }, '', newPath);
     }
   }, [section]);
+
+  // Handle back/forward browser buttons
+  React.useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.section) {
+        setSection(event.state.section);
+      } else {
+        const path = window.location.pathname.replace(/^\/+/g, '');
+        setSection(path === 'admin' ? 'admin' : (path || 'home'));
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Render correct view based on navigation state
   const renderSection = () => {

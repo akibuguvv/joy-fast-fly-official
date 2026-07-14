@@ -84,12 +84,3 @@ export interface GalleryItem {
   studentName: string;
   university: string;
 }
-
-export interface QuickLink {
-  id: string;
-  title: string;
-  slug: string;
-  url: string;
-  category: string;
-  createdAt: string;
-}

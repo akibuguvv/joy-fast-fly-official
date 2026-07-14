@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Facebook, Youtube, Phone, Mail, MapPin, ArrowRight, ExternalLink } from 'lucide-react';
-import { QuickLink } from '../types';
+import React from 'react';
+import { Facebook, Youtube, Phone, Mail, MapPin, ArrowRight } from 'lucide-react';
 
 interface FooterProps {
   setSection: (section: string) => void;
@@ -10,46 +9,6 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
   const handleNavClick = (sectionId: string) => {
     setSection(sectionId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const QuickLinksColumn: React.FC = () => {
-    const [links, setLinks] = useState<QuickLink[]>([]);
-
-    useEffect(() => {
-      const saved = localStorage.getItem('joyfastfly_links');
-      if (saved) {
-        try {
-          setLinks(JSON.parse(saved));
-        } catch (e) {
-          console.error('Failed to load links in footer');
-        }
-      }
-    }, []);
-
-    if (links.length === 0) return null;
-
-    return (
-      <div className="flex flex-col gap-5">
-        <h3 className="text-xl font-bold border-l-4 border-[#da1e28] pl-3 tracking-tight">
-          Quick Links
-        </h3>
-        <ul className="flex flex-col gap-2.5 mt-2">
-          {links.map((link) => (
-            <li key={link.id}>
-              <a 
-                href={link.url} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="text-sm text-gray-300 hover:text-[#da1e28] transition-colors flex items-center gap-2 group"
-              >
-                <ExternalLink size={14} className="opacity-50 group-hover:opacity-100" />
-                {link.title}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
   };
 
   return (
@@ -98,24 +57,22 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
           </div>
         </div>
 
-        {/* Column 2: Destinations & Quick Links */}
-        <div className="flex flex-col gap-8" id="footer-col-2">
-          <div className="flex flex-col gap-5">
-            <h3 className="text-xl font-bold border-l-4 border-[#da1e28] pl-3 tracking-tight" id="footer-title-2">
-              Major Destinations
-            </h3>
-            <div className="flex flex-col gap-2.5 mt-2" id="footer-destinations-wrapper">
-              <div className="flex flex-wrap items-center gap-4" id="footer-destinations">
-                {['Cyprus', 'Serbia', 'Romania'].map((country) => (
-                  <div key={country} className="bg-blue-900/40 border border-blue-800/60 px-3 py-1.5 rounded-md text-xs font-semibold" title={country}>
-                    {country}
-                  </div>
-                ))}
-              </div>
+        {/* Column 2: Destinations */}
+        <div className="flex flex-col gap-5" id="footer-col-2">
+          <h3 className="text-xl font-bold border-l-4 border-[#da1e28] pl-3 tracking-tight" id="footer-title-2">
+            Major Destinations
+          </h3>
+          
+          {/* Countries List Row */}
+          <div className="flex flex-col gap-2.5 mt-2" id="footer-destinations-wrapper">
+            <div className="flex flex-wrap items-center gap-4" id="footer-destinations">
+              {['Cyprus', 'Serbia', 'Romania'].map((country) => (
+                <div key={country} className="bg-blue-900/40 border border-blue-800/60 px-3 py-1.5 rounded-md text-xs font-semibold" title={country}>
+                  {country}
+                </div>
+              ))}
             </div>
           </div>
-
-          <QuickLinksColumn />
         </div>
 
         {/* Column 3: Get In Touch */}

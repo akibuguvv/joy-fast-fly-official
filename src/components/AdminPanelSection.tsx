@@ -41,11 +41,9 @@ import {
   Mail,
   Phone,
   RefreshCw,
-  Landmark,
-  Link as LinkIcon,
-  ExternalLink
+  Landmark
 } from 'lucide-react';
-import { Inquiry, NewsPost, CountryInfo, Course, QuickLink } from '../types';
+import { Inquiry, NewsPost, CountryInfo, Course } from '../types';
 import { JtecLogo } from './JtecLogo';
 
 interface AdminPanelProps {
@@ -151,14 +149,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [newAppCountry, setNewAppCountry] = useState('Cyprus');
   const [newAppVisaType, setNewAppVisaType] = useState('Student Visa');
   const [newAppStatus, setNewAppStatus] = useState<'New' | 'In Review' | 'Pending' | 'Approved'>('New');
-
-  // Link Management States
-  const [links, setLinks] = useState<QuickLink[]>([]);
-  const [showAddLinkModal, setShowAddLinkModal] = useState(false);
-  const [newLinkTitle, setNewLinkTitle] = useState('');
-  const [newLinkSlug, setNewLinkSlug] = useState('');
-  const [newLinkUrl, setNewLinkUrl] = useState('');
-  const [newLinkCategory, setNewLinkCategory] = useState('Resource');
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -759,47 +749,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     setSection('home');
   };
 
-  const addLink = () => {
-    if (!newLinkTitle || !newLinkUrl || !newLinkSlug) {
-      alert('Please fill in all fields including the slug');
-      return;
-    }
-
-    // Check if slug already exists
-    if (links.some(l => l.slug.toLowerCase() === newLinkSlug.toLowerCase())) {
-      alert('This slug is already in use. Please choose another one.');
-      return;
-    }
-
-    const newLink: QuickLink = {
-      id: Date.now().toString(),
-      title: newLinkTitle,
-      slug: newLinkSlug.toLowerCase().replace(/\s+/g, '-'),
-      url: newLinkUrl,
-      category: newLinkCategory,
-      createdAt: new Date().toISOString()
-    };
-    const updated = [newLink, ...links];
-    setLinks(updated);
-    localStorage.setItem('joyfastfly_links', JSON.stringify(updated));
-    setShowAddLinkModal(false);
-    setNewLinkTitle('');
-    setNewLinkSlug('');
-    setNewLinkUrl('');
-  };
-
-  const deleteLink = (id: string) => {
-    requestConfirm(
-      'Delete Link',
-      'Are you sure you want to delete this link?',
-      () => {
-        const updated = links.filter(l => l.id !== id);
-        setLinks(updated);
-        localStorage.setItem('joyfastfly_links', JSON.stringify(updated));
-      }
-    );
-  };
-
   // Sidebar List
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -807,7 +756,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     { id: 'stories', label: 'Success Stories', icon: Award },
     { id: 'applications', label: 'Applications', icon: FileSpreadsheet },
     { id: 'inquiries', label: 'Inquiries', icon: Inbox },
-    { id: 'links', label: 'Link Manager', icon: LinkIcon },
   ];
 
   return (
@@ -2947,7 +2895,7 @@ DELETE FROM inquiries;`);
               )}
 
               {/* TABS 9 to 14 FALLBACK PLATFORM INTERFACES */}
-              {!['dashboard', 'news', 'stories', 'applications', 'inquiries', 'links'].includes(activeTab) && (
+              {!['dashboard', 'news', 'stories', 'applications', 'inquiries'].includes(activeTab) && (
                 <div className="bg-white border border-gray-150 rounded-3xl p-10 shadow-xs text-center flex flex-col items-center justify-center gap-4 animate-fade-in min-h-[350px]">
                   <div className="w-14 h-14 bg-blue-50 text-blue-950 rounded-full flex items-center justify-center">
                     <SettingsIcon size={26} />
@@ -2998,94 +2946,6 @@ DELETE FROM inquiries;`);
                 Yes, Delete
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ADD LINK MODAL */}
-      {showAddLinkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAddLinkModal(false)}></div>
-          <div className="bg-white rounded-3xl border border-gray-150 p-6 md:p-8 max-w-md w-full relative z-10 shadow-2xl animate-scale-up text-left">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-black text-slate-950 tracking-tight">Create New Link</h3>
-              <button onClick={() => setShowAddLinkModal(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); addLink(); }} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Link Title</label>
-                <input 
-                  type="text" 
-                  value={newLinkTitle}
-                  onChange={(e) => setNewLinkTitle(e.target.value)}
-                  placeholder="e.g. Official Embassy Portal"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Short Slug (e.g. visa-portal)</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3.5 text-gray-400 text-sm font-bold">/</span>
-                  <input 
-                    type="text" 
-                    value={newLinkSlug}
-                    onChange={(e) => setNewLinkSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                    placeholder="admission"
-                    className="w-full border border-gray-200 rounded-xl pl-7 pr-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all"
-                    required
-                  />
-                </div>
-                <p className="text-[9px] text-gray-400 font-bold px-1 uppercase tracking-tighter">People will visit: yourdomain.com/{newLinkSlug || 'slug'}</p>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Destination URL</label>
-                <input 
-                  type="url" 
-                  value={newLinkUrl}
-                  onChange={(e) => setNewLinkUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Category</label>
-                <select 
-                  value={newLinkCategory}
-                  onChange={(e) => setNewLinkCategory(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all appearance-none bg-white"
-                >
-                  <option>Resource</option>
-                  <option>Social Media</option>
-                  <option>Partner Site</option>
-                  <option>Official Page</option>
-                  <option>Other</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-100">
-                <button 
-                  type="button"
-                  onClick={() => setShowAddLinkModal(false)}
-                  className="px-5 py-2.5 rounded-xl border border-gray-200 text-xs font-black text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  className="px-6 py-2.5 bg-[#da1e28] hover:bg-red-700 text-white rounded-xl text-xs font-black transition-colors cursor-pointer shadow-lg shadow-red-500/20 uppercase tracking-widest"
-                >
-                  Create Link
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
