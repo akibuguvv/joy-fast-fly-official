@@ -27,6 +27,27 @@ export default function App() {
   const [sharedPosts, setSharedPosts] = useState<NewsPost[]>(INITIAL_NEWS_POSTS);
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    
+    // Handle Custom Redirect Links
+    const path = window.location.pathname.replace(/^\/+/g, '');
+    if (path && path !== '' && path !== 'admin') {
+      const savedLinks = localStorage.getItem('joyfastfly_links');
+      if (savedLinks) {
+        try {
+          const links = JSON.parse(savedLinks);
+          const link = links.find((l: any) => l.slug === path || l.id === path);
+          if (link) {
+            window.location.href = link.url;
+          }
+        } catch (e) {
+          console.error('Redirect failed');
+        }
+      }
+    }
+  }, [section]);
+
   // Render correct view based on navigation state
   const renderSection = () => {
     switch (section) {

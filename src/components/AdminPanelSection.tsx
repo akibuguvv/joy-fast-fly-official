@@ -156,6 +156,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [links, setLinks] = useState<QuickLink[]>([]);
   const [showAddLinkModal, setShowAddLinkModal] = useState(false);
   const [newLinkTitle, setNewLinkTitle] = useState('');
+  const [newLinkSlug, setNewLinkSlug] = useState('');
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkCategory, setNewLinkCategory] = useState('Resource');
 
@@ -759,13 +760,21 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   };
 
   const addLink = () => {
-    if (!newLinkTitle || !newLinkUrl) {
-      alert('Please fill in all fields');
+    if (!newLinkTitle || !newLinkUrl || !newLinkSlug) {
+      alert('Please fill in all fields including the slug');
       return;
     }
+
+    // Check if slug already exists
+    if (links.some(l => l.slug.toLowerCase() === newLinkSlug.toLowerCase())) {
+      alert('This slug is already in use. Please choose another one.');
+      return;
+    }
+
     const newLink: QuickLink = {
       id: Date.now().toString(),
       title: newLinkTitle,
+      slug: newLinkSlug.toLowerCase().replace(/\s+/g, '-'),
       url: newLinkUrl,
       category: newLinkCategory,
       createdAt: new Date().toISOString()
@@ -775,6 +784,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     localStorage.setItem('joyfastfly_links', JSON.stringify(updated));
     setShowAddLinkModal(false);
     setNewLinkTitle('');
+    setNewLinkSlug('');
     setNewLinkUrl('');
   };
 
@@ -2877,15 +2887,16 @@ DELETE FROM inquiries;`);
                         <thead>
                           <tr className="bg-slate-50 border-b border-gray-100 text-[10px] uppercase font-black tracking-widest text-gray-500">
                             <th className="px-6 py-4.5">Title</th>
+                            <th className="px-6 py-4.5">Short Link</th>
                             <th className="px-6 py-4.5">Category</th>
-                            <th className="px-6 py-4.5">URL</th>
+                            <th className="px-6 py-4.5">Destination</th>
                             <th className="px-6 py-4.5 text-right">Action</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-sm font-semibold text-slate-800">
                           {links.length === 0 ? (
                             <tr>
-                              <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-bold">
+                              <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-bold">
                                 No links created yet. Click "Add New Link" to get started.
                               </td>
                             </tr>
@@ -2894,11 +2905,29 @@ DELETE FROM inquiries;`);
                               <tr key={link.id} className="hover:bg-slate-50/50 transition-colors">
                                 <td className="px-6 py-4.5 font-extrabold text-blue-950">{link.title}</td>
                                 <td className="px-6 py-4.5">
+                                  <div className="flex items-center gap-2">
+                                    <code className="bg-slate-100 px-2 py-1 rounded text-[#da1e28] text-xs font-bold">
+                                      /{link.slug}
+                                    </code>
+                                    <button 
+                                      onClick={() => {
+                                        const fullUrl = `${window.location.origin}/${link.slug}`;
+                                        navigator.clipboard.writeText(fullUrl);
+                                        alert('Link copied to clipboard!');
+                                      }}
+                                      className="p-1 text-gray-400 hover:text-blue-600 cursor-pointer"
+                                      title="Copy full link"
+                                    >
+                                      <RefreshCw size={12} />
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4.5">
                                   <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-black uppercase rounded-sm">
                                     {link.category}
                                   </span>
                                 </td>
-                                <td className="px-6 py-4.5 text-blue-600 truncate max-w-[200px]">{link.url}</td>
+                                <td className="px-6 py-4.5 text-gray-500 truncate max-w-[150px]">{link.url}</td>
                                 <td className="px-6 py-4.5 text-right">
                                   <button 
                                     onClick={() => deleteLink(link.id)}
@@ -2996,6 +3025,22 @@ DELETE FROM inquiries;`);
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all"
                   required
                 />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Short Slug (e.g. visa-portal)</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-3.5 text-gray-400 text-sm font-bold">/</span>
+                  <input 
+                    type="text" 
+                    value={newLinkSlug}
+                    onChange={(e) => setNewLinkSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                    placeholder="admission"
+                    className="w-full border border-gray-200 rounded-xl pl-7 pr-4 py-3 text-sm font-bold focus:border-[#da1e28] outline-hidden transition-all"
+                    required
+                  />
+                </div>
+                <p className="text-[9px] text-gray-400 font-bold px-1 uppercase tracking-tighter">People will visit: yourdomain.com/{newLinkSlug || 'slug'}</p>
               </div>
 
               <div className="flex flex-col gap-1.5">

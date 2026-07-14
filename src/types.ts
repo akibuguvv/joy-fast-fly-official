@@ -88,6 +88,7 @@ export interface GalleryItem {
 export interface QuickLink {
   id: string;
   title: string;
+  slug: string;
   url: string;
   category: string;
   createdAt: string;
