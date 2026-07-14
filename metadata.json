@@ -1,0 +1,6 @@
+{
+  "name": "Joy Fast Fly",
+  "description": "Joy Fast Fly is a leading educational consulting agency assisting students with student visa processing, study abroad, and immigration guidance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
