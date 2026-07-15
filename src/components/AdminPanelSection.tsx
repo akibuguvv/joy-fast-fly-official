@@ -82,12 +82,21 @@ interface CountryAdminItem {
 
 export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, setSection }) => {
   const [adminUnlocked, setAdminUnlocked] = useState(() => localStorage.getItem('admin_unlocked') === 'true');
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
 
+  // Check auth session on mount
   useEffect(() => {
-    localStorage.setItem('admin_unlocked', String(adminUnlocked));
-  }, [adminUnlocked]);
+    const checkSession = async () => {
+      if (!supabase) return;
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setAdminUnlocked(true);
+      }
+    };
+    checkSession();
+  }, []);
   
   // Left Sidebar active tab
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -387,13 +396,23 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   };
 
   // Handle Admin Password Unlock
-  const handleAdminUnlock = (e: React.FormEvent) => {
+  const handleAdminUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === '1234' || adminPassword.toLowerCase() === 'joyfastfly') {
+    if (!supabase) {
+      setAdminError('Supabase not initialized');
+      return;
+    }
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email: adminEmail,
+      password: adminPassword,
+    });
+    
+    if (error) {
+      setAdminError(error.message);
+    } else {
       setAdminUnlocked(true);
       setAdminError('');
-    } else {
-      setAdminError('ভুল পাসওয়ার্ড। (Incorrect password)');
     }
   };
 
@@ -780,19 +799,27 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
               <Lock size={28} />
             </div>
 
-            <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">Admin Workspace Lock</h2>
+            <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">Admin Workspace</h2>
             <p className="text-slate-400 text-sm mb-6 leading-relaxed">
-              Enter secure PIN to authorize. (Default: <code className="bg-slate-800 text-red-400 px-1.5 py-0.5 rounded font-mono">1234</code>)
+              Sign in with your admin credentials to access the workspace.
             </p>
 
             <form onSubmit={handleAdminUnlock} className="w-full flex flex-col gap-4">
               <input 
+                type="email"
+                required
+                placeholder="Admin Email"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                className="w-full border border-slate-700 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 bg-slate-800 text-white font-medium placeholder:text-slate-500"
+              />
+              <input 
                 type="password"
                 required
-                placeholder="••••"
+                placeholder="Password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
-                className="w-full border border-slate-700 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 bg-slate-800 text-white font-extrabold text-center text-lg tracking-widest placeholder:tracking-normal placeholder:text-slate-500"
+                className="w-full border border-slate-700 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3.5 bg-slate-800 text-white font-medium placeholder:text-slate-500"
               />
               <button
                 type="submit"
