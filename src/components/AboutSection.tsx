@@ -184,7 +184,7 @@ export const AboutSection: React.FC = () => {
                 As a Denmark Expatriate who has experienced global integration first-hand, I established Joy Fast Fly with a single, unyielding focus: to build a highly transparent, rapid, and successful roadmap for students and skilled workers from Bangladesh. 
               </p>
               <p className="text-xs text-gray-600 font-semibold leading-relaxed">
-                Whether you seek higher education in premium European institutes or want to secure your future through authorized skilled worker agreements in Serbia or Romania, our direct networks ensure high visa approval ratios and complete reliability. Let us fly together towards your secure future.
+                Whether you seek higher education in premium European institutes or want to secure your future through authorized skilled worker agreements in Serbia, Romania, or Greece, our direct networks ensure high visa approval ratios and complete reliability. Let us fly together towards your secure future.
               </p>
             </div>
 

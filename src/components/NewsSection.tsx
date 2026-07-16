@@ -206,30 +206,36 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
       {!selectedPost && (
         <>
           {/* 1. Header Banner */}
-          <section className="bg-white pt-16 pb-8 px-4 md:px-8 border-b border-gray-100" id="news-header-banner">
+          <section className="bg-gradient-to-b from-slate-50 to-white pt-20 pb-12 px-4 md:px-8 border-b border-gray-200" id="news-header-banner">
             <div className="max-w-7xl mx-auto flex flex-col gap-6 text-left relative z-10">
-              <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
-                News & Updates
+              <div className="flex items-center gap-3">
+                <span className="w-10 h-1 bg-[#da1e28]"></span>
+                <span className="text-[#da1e28] text-xs font-black uppercase tracking-[0.2em] font-mono">
+                  Joy Fast Fly Media
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight leading-none uppercase">
+                News & Updates <span className="text-[#da1e28] text-base md:text-2xl font-black font-mono block sm:inline sm:ml-2">(খবর ও নোটিশ)</span>
               </h1>
-              <p className="text-sm md:text-base text-gray-500 max-w-2xl">
-                Stay updated with the latest visa information, embassy announcements, and important notices.
+              <p className="text-sm md:text-base text-gray-500 max-w-2xl font-medium leading-relaxed">
+                Stay informed with authentic student visa insights, embassy circulars, and real-time immigration guidelines for Schengen and European countries.
               </p>
 
               {/* Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="flex items-center bg-gray-50 p-1.5 border border-gray-200 max-w-lg mt-2">
+              <form onSubmit={handleSearchSubmit} className="flex items-center bg-white p-1.5 border-2 border-gray-950 max-w-lg mt-4 shadow-sm">
                 <div className="flex items-center pl-3 pr-2 text-gray-400">
-                  <Search size={18} />
+                  <Search size={18} className="text-gray-950" />
                 </div>
                 <input 
                   type="text" 
-                  placeholder="Search news..."
+                  placeholder="Search news & circulars..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-grow bg-transparent text-sm font-bold text-gray-900 placeholder-gray-400 focus:outline-none py-2 px-1"
+                  className="flex-grow bg-transparent text-sm font-black text-gray-900 placeholder-gray-400 focus:outline-none py-2 px-1"
                 />
                 <button 
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider px-6 py-2 transition-colors"
+                  className="bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider px-6 py-2.5 transition-colors rounded-none cursor-pointer"
                 >
                   Search
                 </button>
@@ -238,7 +244,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
           </section>
 
           {/* 2. Horizontal Category Section */}
-          <section className="bg-white border-b-2 border-gray-900 px-4 md:px-8 sticky top-20 z-30" id="news-category-bar">
+          <section className="bg-white border-b border-gray-200 px-4 md:px-8 sticky top-20 z-30 shadow-xs" id="news-category-bar">
             <div className="max-w-7xl mx-auto flex items-center gap-6 overflow-x-auto no-scrollbar scroll-smooth">
               {categories.map((cat) => (
                 <button
@@ -247,7 +253,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                   className={`py-4 text-xs font-black tracking-widest uppercase transition-all shrink-0 border-b-2 -mb-[2px] ${
                     selectedCategory === cat
                       ? 'border-[#da1e28] text-[#da1e28]'
-                      : 'border-transparent text-gray-600 hover:text-blue-600'
+                      : 'border-transparent text-gray-600 hover:text-[#da1e28]'
                   }`}
                 >
                   {cat}
@@ -272,16 +278,16 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               
               {/* Breadcrumb path */}
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
-                <button onClick={() => { setSelectedPost(null); handleCategoryClick('All News'); }} className="hover:text-blue-600 transition-colors">Home</button>
+                <button onClick={() => { setSelectedPost(null); handleCategoryClick('All News'); }} className="hover:text-[#da1e28] transition-colors">Home</button>
                 <ChevronRight size={12} className="text-gray-300" />
-                <button onClick={() => setSelectedPost(null)} className="hover:text-blue-600 transition-colors">News</button>
+                <button onClick={() => setSelectedPost(null)} className="hover:text-[#da1e28] transition-colors">News</button>
                 <ChevronRight size={12} className="text-gray-300" />
-                <span className="text-gray-800 truncate max-w-[150px] md:max-w-[200px]">{selectedPost.title}</span>
+                <span className="text-gray-800 truncate max-w-[150px] md:max-w-[200px] font-extrabold">{selectedPost.title}</span>
               </div>
 
               {/* Title, Date and Metas */}
               <div className="flex flex-col gap-4">
-                <span className="inline-flex items-center px-3 py-1 text-[11px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-full w-fit">
+                <span className="inline-flex items-center px-3 py-1 text-[11px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-none w-fit">
                   {selectedPost.category}
                 </span>
                 <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">
@@ -294,7 +300,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                     <div className="flex flex-col text-left leading-tight">
                       <span className="text-sm font-bold text-gray-900">Joy Fast Fly Desk</span>
                       <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
-                        <Calendar size={12} /> {selectedPost.date} &bull; {selectedPost.readTime || '3 min read'}
+                        <Calendar size={12} className="text-[#da1e28]" /> {selectedPost.date} &bull; {selectedPost.readTime || '3 min read'}
                       </span>
                     </div>
                   </div>
@@ -302,16 +308,16 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                   {/* Share Icons */}
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">Share:</span>
-                    <a href="#" className="w-8 h-8 rounded-full border border-gray-200 hover:border-blue-600 hover:text-blue-600 flex items-center justify-center text-gray-400 transition-colors">
+                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-[#da1e28] hover:text-[#da1e28] flex items-center justify-center text-gray-400 transition-colors">
                       <Facebook size={14} />
                     </a>
-                    <a href="#" className="w-8 h-8 rounded-full border border-gray-200 hover:border-sky-500 hover:text-sky-500 flex items-center justify-center text-gray-400 transition-colors">
+                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-sky-500 hover:text-sky-500 flex items-center justify-center text-gray-400 transition-colors">
                       <Twitter size={14} />
                     </a>
-                    <a href="#" className="w-8 h-8 rounded-full border border-gray-200 hover:border-blue-700 hover:text-blue-700 flex items-center justify-center text-gray-400 transition-colors">
+                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-blue-700 hover:text-blue-700 flex items-center justify-center text-gray-400 transition-colors">
                       <Linkedin size={14} />
                     </a>
-                    <a href="#" className="w-8 h-8 rounded-full border border-gray-200 hover:border-green-600 hover:text-green-600 flex items-center justify-center text-gray-400 transition-colors">
+                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-green-600 hover:text-green-600 flex items-center justify-center text-gray-400 transition-colors">
                       <MessageCircle size={14} />
                     </a>
                   </div>
@@ -319,7 +325,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               </div>
 
               {/* Big Featured Cover Image */}
-              <div className="relative w-full aspect-[16/9] bg-gray-100 mt-2 shadow-sm rounded-xl overflow-hidden">
+              <div className="relative w-full aspect-[16/9] bg-gray-100 mt-2 shadow-sm rounded-none overflow-hidden border border-gray-200">
                 {selectedPost.fileType === 'image' ? (
                   <img src={selectedPost.mediaUrl} alt={selectedPost.title} className="w-full h-full object-cover" />
                 ) : (() => {
@@ -361,11 +367,11 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
               {/* Highlights section (if present) */}
               {selectedPost.highlights && selectedPost.highlights.length > 0 && (
-                <div className="bg-red-50/40 border border-red-100 rounded-2xl p-6">
-                  <h4 className="font-black text-blue-950 text-sm uppercase tracking-wider mb-3">Key Highlights:</h4>
+                <div className="bg-red-50/40 border-l-4 border-[#da1e28] rounded-none p-6">
+                  <h4 className="font-black text-[#da1e28] text-sm uppercase tracking-wider mb-3">Key Highlights:</h4>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {selectedPost.highlights.map((high, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-xs text-gray-700 font-semibold">
+                      <li key={i} className="flex items-start gap-2.5 text-xs text-gray-700 font-bold">
                         <Check size={14} className="text-[#da1e28] mt-0.5 shrink-0" />
                         <span>{high}</span>
                       </li>
@@ -376,29 +382,29 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
               {/* Student details structured layout (Crucial for mockup screen 4) */}
               {selectedPost.studentDetails && (
-                <div className="bg-gray-50 border border-gray-200/50 rounded-2xl p-6 md:p-8">
-                  <h4 className="font-black text-blue-950 text-sm uppercase tracking-widest mb-4 border-b border-gray-200/60 pb-2">
+                <div className="bg-gray-50 border-2 border-gray-950 rounded-none p-6 md:p-8 shadow-sm">
+                  <h4 className="font-black text-[#da1e28] text-sm uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">
                     Student Information (শিক্ষার্থী তথ্য)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6 text-xs">
-                    <div className="flex justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-gray-400 uppercase tracking-wider">Name:</span>
+                    <div className="flex justify-between border-b border-gray-150 pb-2">
+                      <span className="font-bold text-gray-500 uppercase tracking-wider">Name:</span>
                       <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.name}</span>
                     </div>
-                    <div className="flex justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-gray-400 uppercase tracking-wider">Country:</span>
+                    <div className="flex justify-between border-b border-gray-150 pb-2">
+                      <span className="font-bold text-gray-500 uppercase tracking-wider">Country:</span>
                       <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.country}</span>
                     </div>
-                    <div className="flex justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-gray-400 uppercase tracking-wider">Applied For:</span>
+                    <div className="flex justify-between border-b border-gray-150 pb-2">
+                      <span className="font-bold text-gray-500 uppercase tracking-wider">Applied For:</span>
                       <span className="font-black text-[#da1e28] text-right">{selectedPost.studentDetails.appliedFor}</span>
                     </div>
-                    <div className="flex justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-gray-400 uppercase tracking-wider">Intake:</span>
+                    <div className="flex justify-between border-b border-gray-150 pb-2">
+                      <span className="font-bold text-gray-500 uppercase tracking-wider">Intake:</span>
                       <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.intake}</span>
                     </div>
-                    <div className="sm:col-span-2 flex justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-gray-400 uppercase tracking-wider">University:</span>
+                    <div className="sm:col-span-2 flex justify-between border-b border-gray-150 pb-2">
+                      <span className="font-bold text-gray-500 uppercase tracking-wider">University:</span>
                       <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.university}</span>
                     </div>
                   </div>
@@ -410,35 +416,67 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                 {selectedPost.body}
               </div>
 
-              {/* Gallery Thumbnails Grid (Mockup screen 3 & 4 gallery layout) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-8">
-                <img src="https://images.unsplash.com/photo-1517400508447-f8dd518b86db?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
-                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
-                <img src="https://images.unsplash.com/photo-1555979864-747248e21e25?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
+              {/* Gallery Section (ফটো গ্যালারি) */}
+              <div className="mt-10 pt-8 border-t border-gray-150/80">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-6 bg-[#da1e28]"></div>
+                  <h3 className="font-black text-gray-950 text-sm uppercase tracking-widest">
+                    Media Gallery (ফটো গ্যালারি)
+                  </h3>
+                </div>
+                <p className="text-xs font-semibold text-gray-400 mb-4 uppercase">
+                  Moments from our students' journeys and successful visa handovers
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600" 
+                      alt="Joy Fast Fly Success" 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600" 
+                      alt="Joy Fast Fly Campus" 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1568291843233-64e0023a8542?q=80&w=600" 
+                      alt="Joy Fast Fly Student Visa" 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Footer navigation for post swapping */}
               <div className="flex items-center justify-between border-y border-gray-200 py-6 mt-8">
                 <button 
                   onClick={() => handlePrevArticle(selectedPost.id)}
-                  className="flex items-center gap-3 group hover:text-blue-600 transition-colors"
+                  className="flex items-center gap-3 group hover:text-[#da1e28] transition-colors"
                 >
-                  <ArrowLeft size={18} className="text-gray-400 group-hover:text-blue-600 group-hover:-translate-x-1 transition-all" />
+                  <ArrowLeft size={18} className="text-gray-400 group-hover:text-[#da1e28] group-hover:-translate-x-1 transition-all" />
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Previous News</span>
-                    <span className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors text-sm">আগের খবর</span>
+                    <span className="font-black text-gray-900 group-hover:text-[#da1e28] transition-colors text-sm">আগের খবর</span>
                   </div>
                 </button>
 
                 <button 
                   onClick={() => handleNextArticle(selectedPost.id)}
-                  className="flex items-center gap-3 group hover:text-blue-600 transition-colors text-right"
+                  className="flex items-center gap-3 group hover:text-[#da1e28] transition-colors text-right"
                 >
                   <div className="flex flex-col text-right">
                     <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Next News</span>
-                    <span className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors text-sm">পরবর্তী খবর</span>
+                    <span className="font-black text-gray-900 group-hover:text-[#da1e28] transition-colors text-sm">পরবর্তী খবর</span>
                   </div>
-                  <ArrowRight size={18} className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                  <ArrowRight size={18} className="text-gray-400 group-hover:text-[#da1e28] group-hover:translate-x-1 transition-all" />
                 </button>
               </div>
 
@@ -449,8 +487,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               
               {/* Category Counts Widget */}
               <div className="bg-white">
-                <div className="flex items-center gap-2 border-b-2 border-gray-900 pb-3 mb-5">
-                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-widest">
+                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
+                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
                     Categories
                   </h3>
                 </div>
@@ -459,10 +497,10 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                     <button
                       key={cat}
                       onClick={() => handleCategoryClick(cat)}
-                      className={`flex items-center justify-between py-2 border-b border-gray-100 last:border-0 transition-all ${
+                      className={`flex items-center justify-between py-2 border-b border-gray-150 last:border-0 transition-all cursor-pointer ${
                         selectedCategory === cat
-                          ? 'text-blue-600 font-bold'
-                          : 'text-gray-700 font-medium hover:text-blue-600'
+                          ? 'text-[#da1e28] font-black'
+                          : 'text-gray-700 font-bold hover:text-[#da1e28]'
                       }`}
                     >
                       <span className="text-sm">{cat}</span>
@@ -476,8 +514,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
               {/* Related News / Trending Now Sidebar */}
               <div className="bg-white">
-                <div className="flex items-center gap-2 border-b-2 border-gray-900 pb-3 mb-5">
-                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-widest">
+                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
+                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
                     Related News
                   </h3>
                 </div>
@@ -488,12 +526,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       onClick={() => setSelectedPost(post)}
                       className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative">
+                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative border border-gray-200 rounded-none">
                         <MediaPreview post={post} iconSize={18} />
                       </div>
                       <div className="flex flex-col flex-1">
-                        <span className="text-[10px] text-gray-500 font-bold mb-1">{post.date}</span>
-                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                        <span className="text-[10px] text-[#da1e28] font-black mb-1 font-mono">{post.date}</span>
+                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
                           {post.title}
                         </h4>
                       </div>
@@ -503,15 +541,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               </div>
 
               {/* Counselor Help Profile Card */}
-              <div className="bg-gray-50 border border-gray-200 p-6 flex flex-col gap-4">
-                <div className="relative w-full h-44 overflow-hidden bg-gray-200">
+              <div className="bg-gray-50 border-2 border-gray-950 p-6 flex flex-col gap-4">
+                <div className="relative w-full h-44 overflow-hidden bg-gray-200 border border-gray-300 rounded-none">
                   <img 
                     src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400" 
                     alt="Joy Fast Fly Expert" 
                     className="w-full h-full object-cover object-top mix-blend-multiply" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-3 left-3 text-xs font-bold text-white uppercase tracking-wider">
+                  <span className="absolute bottom-3 left-3 text-xs font-black text-white uppercase tracking-wider font-mono">
                     Senior Counselor
                   </span>
                 </div>
@@ -519,13 +557,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                   <h3 className="font-black text-gray-900 text-lg leading-tight">
                     Need Help with Visa Process?
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
                     Our expert team is ready to guide you step-by-step through the process.
                   </p>
                 </div>
                 <button
                   onClick={() => setSection?.('contact')}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-xs font-bold uppercase tracking-widest transition-colors mt-2"
+                  className="w-full bg-[#da1e28] hover:bg-red-700 text-white py-3.5 px-4 text-xs font-black uppercase tracking-widest transition-colors mt-2 rounded-none cursor-pointer"
                 >
                   Contact Now
                 </button>
@@ -551,26 +589,30 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                   
                   {/* Featured News Widget */}
                   {featuredPost && (
-                    <div className="flex flex-col gap-4 text-left border-b border-gray-900 pb-8 cursor-pointer group" onClick={() => setSelectedPost(featuredPost)} id={`featured-post-${featuredPost.id}`}>
+                    <div className="flex flex-col gap-5 text-left border-b border-gray-200 pb-10 cursor-pointer group" onClick={() => setSelectedPost(featuredPost)} id={`featured-post-${featuredPost.id}`}>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 bg-[#da1e28]"></span>
+                        <span className="text-xs font-black uppercase tracking-widest text-[#da1e28] font-mono">Featured Update (विशेष খবর)</span>
+                      </div>
                       {/* Featured Image */}
-                      <div className="w-full relative overflow-hidden bg-gray-100 mb-2">
+                      <div className="w-full relative overflow-hidden bg-gray-100 mb-2 border border-gray-200 rounded-none">
                         <img 
                           src={featuredPost.mediaUrl} 
                           alt={featuredPost.title} 
-                          className="w-full aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105" 
+                          className="w-full aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-102" 
                         />
                       </div>
                       
                       {/* Featured details */}
                       <div className="flex flex-col gap-3">
-                        <h3 className="text-3xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                        <h3 className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-tight uppercase">
                           {featuredPost.title}
                         </h3>
-                        <p className="text-gray-600 text-sm md:text-base leading-relaxed line-clamp-3">
+                        <p className="text-gray-600 text-sm md:text-base leading-relaxed line-clamp-3 font-medium">
                           {featuredPost.body}
                         </p>
-                        <div className="flex items-center gap-3 mt-2 text-xs font-bold text-gray-400">
-                          <span className="text-[#da1e28] uppercase">{featuredPost.category}</span>
+                        <div className="flex items-center gap-3 mt-1 text-xs font-black text-gray-400 uppercase">
+                          <span className="text-[#da1e28] bg-red-50 border border-red-100 px-2 py-0.5 rounded-none font-black">{featuredPost.category}</span>
                           <span>&bull;</span>
                           <span>{featuredPost.date}</span>
                         </div>
@@ -580,50 +622,47 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
                   {/* Latest Updates Grid block */}
                   <div className="flex flex-col gap-6 text-left">
-                    <div className="flex items-center gap-2 border-b-2 border-gray-900 pb-3">
-                      <h2 className="text-xl font-black text-gray-900 uppercase tracking-widest text-sm">
+                    <div className="flex items-center gap-2 border-b border-gray-200 pb-3">
+                      <h2 className="text-sm font-black text-gray-950 uppercase tracking-widest">
                         Latest Updates
                       </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {filteredPosts.slice(0, visibleCount).map((post) => (
-                        <div 
-                          key={post.id}
-                          onClick={() => setSelectedPost(post)}
-                          className="group cursor-pointer flex flex-col bg-white border border-gray-150/80 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-0.5"
-                          id={`news-card-${post.id}`}
-                        >
-                          {/* Image/Video preview */}
-                          <div className="relative aspect-[16/10] overflow-hidden bg-gray-50 border-b border-gray-100">
-                            <MediaPreview post={post} iconSize={36} />
-                          </div>
+                    <div className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-none overflow-hidden">
+                      {/* Top Accent Bar like in reference image */}
+                      <div className="h-1.5 w-full bg-[#da1e28]"></div>
+                      
+                      <div className="flex flex-col divide-y divide-gray-100">
+                        {filteredPosts.slice(0, visibleCount).map((post) => (
+                          <div 
+                            key={post.id}
+                            onClick={() => setSelectedPost(post)}
+                            className="flex flex-col sm:flex-row gap-4 p-4 md:p-6 group cursor-pointer hover:bg-slate-50 transition-colors"
+                          >
+                            {/* Left: Compact Thumbnail container */}
+                            <div className="w-full sm:w-48 md:w-56 aspect-[16/10] relative overflow-hidden bg-gray-50 shrink-0 border border-gray-200 rounded-none">
+                              <MediaPreview post={post} iconSize={24} />
+                            </div>
 
-                          {/* Content summary */}
-                          <div className="flex flex-col flex-grow text-left p-5 justify-between gap-4">
-                            <div className="flex flex-col gap-2">
-                              <span className="inline-flex items-center px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-full w-fit">
+                            {/* Right: Content details (Title + Date w/ Icon) */}
+                            <div className="flex flex-col justify-start flex-grow text-left py-1">
+                              <span className="text-[10px] font-black text-[#da1e28] uppercase tracking-widest font-mono mb-2">
                                 {post.category}
                               </span>
-                              <h3 className="text-base font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">
+                              <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug mb-3">
                                 {post.title}
                               </h3>
-                              <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 font-medium">
-                                {post.body}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-                              <span className="text-[10px] font-bold text-gray-400 uppercase">
-                                {post.date}
-                              </span>
-                              <span className="text-blue-600 font-extrabold text-[10px] uppercase tracking-wider group-hover:underline flex items-center gap-1">
-                                Read More <ArrowRight size={10} />
-                              </span>
+                              
+                              <div className="flex items-center gap-2 text-sky-600 font-bold">
+                                <Calendar size={16} className="shrink-0" />
+                                <span className="text-xs md:text-sm uppercase tracking-wider font-mono">
+                                  {post.date}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
 
                     {/* Load More Controller */}
@@ -631,7 +670,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       <div className="flex justify-center mt-6">
                         <button
                           onClick={() => setVisibleCount(prev => prev + 4)}
-                          className="px-8 py-3.5 bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md hover:shadow-lg transition-all"
+                          className="px-8 py-3.5 bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest rounded-none shadow-md hover:shadow-lg transition-all cursor-pointer"
                         >
                           Load More News
                         </button>
@@ -642,15 +681,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                 </div>
               ) : (
                 /* ==========================================
-                   STATE 2: News List / Search Results View
+                   STATE 2: News List / Search Results View (Matching Reference Image)
                    ========================================== */
                 <div className="flex flex-col gap-6 text-left">
                   
                   {/* Dynamic Header details */}
                   <div className="flex items-center justify-between flex-wrap gap-4 border-b border-gray-100 pb-4">
                     <div className="flex flex-col gap-1">
-                      <h2 className="text-2xl font-black text-blue-950 tracking-tight">
-                        {selectedCategory !== 'All News' ? selectedCategory : 'All News & Updates'}
+                      <h2 className="text-xl font-black text-gray-950 tracking-tight uppercase">
+                        {selectedCategory !== 'All News' ? selectedCategory : 'News & Circulars'}
                       </h2>
                       {appliedSearch && (
                         <p className="text-xs font-semibold text-gray-400">
@@ -661,56 +700,60 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
                     {/* Sorting selector */}
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-gray-400 uppercase">Sort by:</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort:</span>
                       <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value as 'Latest' | 'Oldest')}
-                        className="border border-gray-200 text-xs font-black text-blue-950 rounded-xl px-3 py-2 bg-white focus:outline-none"
+                        className="border-2 border-gray-950 text-[10px] font-black text-gray-950 rounded-none px-3 py-1.5 bg-white focus:outline-none cursor-pointer"
                       >
-                        <option value="Latest">Latest</option>
-                        <option value="Oldest">Oldest</option>
+                        <option value="Latest">LATEST</option>
+                        <option value="Oldest">OLDEST</option>
                       </select>
                     </div>
                   </div>
 
-                  {/* News list items (horizontal list card layout) */}
+                  {/* News list items (Matching the layout in the image) */}
                   {paginatedPosts.length > 0 ? (
-                    <div className="flex flex-col">
-                      {paginatedPosts.map((post) => (
-                        <div 
-                          key={post.id}
-                          onClick={() => setSelectedPost(post)}
-                          className="flex flex-col md:flex-row gap-6 py-6 border-b border-gray-100 group cursor-pointer last:border-0"
-                        >
-                          {/* Left: Thumbnail container */}
-                          <div className="w-full md:w-64 aspect-[3/2] relative overflow-hidden bg-gray-100 shrink-0">
-                            <MediaPreview post={post} iconSize={24} />
-                          </div>
+                    <div className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-none overflow-hidden">
+                      {/* Top Accent Bar like in reference image */}
+                      <div className="h-1.5 w-full bg-sky-500"></div>
+                      
+                      <div className="flex flex-col divide-y divide-gray-100">
+                        {paginatedPosts.map((post) => (
+                          <div 
+                            key={post.id}
+                            onClick={() => setSelectedPost(post)}
+                            className="flex flex-col sm:flex-row gap-4 p-4 md:p-6 group cursor-pointer hover:bg-slate-50 transition-colors"
+                          >
+                            {/* Left: Compact Thumbnail container */}
+                            <div className="w-full sm:w-48 md:w-56 aspect-[16/10] relative overflow-hidden bg-gray-50 shrink-0 border border-gray-200 rounded-none">
+                              <MediaPreview post={post} iconSize={24} />
+                            </div>
 
-                          {/* Right: details info */}
-                          <div className="flex flex-col justify-between flex-grow text-left">
-                            <div className="flex flex-col gap-2">
-                              <span className="text-[10px] font-black text-[#da1e28] uppercase tracking-wider">
-                                {post.category}
-                              </span>
-                              <h3 className="text-xl md:text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                            {/* Right: Content details (Title + Date w/ Icon) */}
+                            <div className="flex flex-col justify-start flex-grow text-left py-1">
+                              <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug mb-3">
                                 {post.title}
                               </h3>
-                              <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                              
+                              <div className="flex items-center gap-2 text-sky-600 font-bold">
+                                <Calendar size={16} className="shrink-0" />
+                                <span className="text-xs md:text-sm uppercase tracking-wider font-mono">
+                                  {post.date}
+                                </span>
+                              </div>
+                              
+                              <p className="text-gray-500 text-xs mt-3 line-clamp-2 leading-relaxed font-medium">
                                 {post.body}
                               </p>
                             </div>
-
-                            <div className="flex items-center gap-3 mt-4 text-[10px] font-bold text-gray-400 uppercase">
-                              <span>{post.date}</span>
-                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   ) : (
-                    <div className="bg-white border border-gray-200/50 rounded-2xl py-16 text-center shadow-sm">
-                      <p className="text-gray-400 text-sm font-semibold">
+                    <div className="bg-white border border-gray-200 py-16 text-center rounded-none shadow-sm">
+                      <p className="text-gray-950 text-sm font-black uppercase tracking-wider font-mono">
                         কোনো ফলাফল পাওয়া যায়নি। (No news posts match your filter criteria)
                       </p>
                     </div>
@@ -718,11 +761,11 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
                   {/* Standard pagination buttons widget */}
                   {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-1.5 mt-8 border-t border-gray-100 pt-6">
+                    <div className="flex items-center justify-center gap-1.5 mt-8 border-t border-gray-200 pt-6">
                       <button
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
-                        className="w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-blue-950 flex items-center justify-center transition-colors disabled:opacity-50"
+                        className="w-10 h-10 rounded-none bg-white border-2 border-gray-950 text-gray-950 hover:bg-gray-150 flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
                       >
                         <ChevronLeft size={16} />
                       </button>
@@ -731,10 +774,10 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                         <button
                           key={i}
                           onClick={() => setCurrentPage(i + 1)}
-                          className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
+                          className={`w-10 h-10 rounded-none text-xs font-black transition-all border-2 cursor-pointer ${
                             currentPage === i + 1
-                              ? 'bg-[#da1e28] text-white shadow-md shadow-red-50'
-                              : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                              ? 'bg-[#da1e28] border-[#da1e28] text-white shadow-md shadow-red-600/10'
+                              : 'bg-white border-gray-950 text-gray-950 hover:bg-gray-150'
                           }`}
                         >
                           {i + 1}
@@ -744,7 +787,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       <button
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
-                        className="w-10 h-10 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-blue-950 flex items-center justify-center transition-colors disabled:opacity-50"
+                        className="w-10 h-10 rounded-none bg-white border-2 border-gray-950 text-gray-950 hover:bg-gray-150 flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
                       >
                         <ChevronRight size={16} />
                       </button>
@@ -759,8 +802,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               
               {/* Trending Now Sidebar */}
               <div className="bg-white">
-                <div className="flex items-center gap-2 border-b-2 border-gray-900 pb-3 mb-5">
-                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-widest">
+                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
+                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
                     Trending Now
                   </h3>
                 </div>
@@ -772,12 +815,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       onClick={() => setSelectedPost(post)}
                       className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative">
+                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative border border-gray-200 rounded-none">
                         <MediaPreview post={post} iconSize={18} />
                       </div>
                       <div className="flex flex-col flex-1 text-left">
-                        <span className="text-[10px] text-[#da1e28] font-bold mb-1 uppercase">{post.category}</span>
-                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                        <span className="text-[10px] text-[#da1e28] font-black mb-1 uppercase font-mono">{post.category}</span>
+                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
                           {post.title}
                         </h4>
                       </div>
@@ -788,8 +831,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
               {/* Popular Tags cloud */}
               <div className="bg-white mt-4">
-                <div className="flex items-center gap-2 border-b-2 border-gray-900 pb-3 mb-5">
-                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-widest">
+                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
+                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
                     Popular Tags
                   </h3>
                 </div>
@@ -798,7 +841,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                     <button
                       key={tag}
                       onClick={() => handleTagClick(tag)}
-                      className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium border border-gray-200 transition-colors"
+                      className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-black border border-gray-200 transition-colors rounded-none cursor-pointer"
                     >
                       {tag}
                     </button>
@@ -807,15 +850,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               </div>
 
               {/* Counselor Help Profile Card */}
-              <div className="bg-gray-50 border border-gray-200 p-6 flex flex-col gap-4 mt-4">
-                <div className="relative w-full h-44 overflow-hidden bg-gray-200">
+              <div className="bg-gray-50 border-2 border-gray-950 p-6 flex flex-col gap-4 mt-4">
+                <div className="relative w-full h-44 overflow-hidden bg-gray-200 border border-gray-300 rounded-none">
                   <img 
                     src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400" 
                     alt="Joy Fast Fly Expert" 
                     className="w-full h-full object-cover object-top mix-blend-multiply" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-3 left-3 text-xs font-bold text-white uppercase tracking-wider">
+                  <span className="absolute bottom-3 left-3 text-xs font-black text-white uppercase tracking-wider font-mono">
                     Our Senior Counselor
                   </span>
                 </div>
@@ -823,13 +866,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                   <h3 className="font-black text-gray-900 text-lg leading-tight">
                     Need Help with Visa Process?
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
                     Our expert team is ready to guide you step-by-step through the process.
                   </p>
                 </div>
                 <button
                   onClick={() => setSection?.('contact')}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-xs font-bold uppercase tracking-widest transition-colors mt-2"
+                  className="w-full bg-[#da1e28] hover:bg-red-700 text-white py-3.5 px-4 text-xs font-black uppercase tracking-widest transition-colors mt-2 rounded-none cursor-pointer"
                 >
                   Contact Now
                 </button>

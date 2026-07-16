@@ -11,7 +11,6 @@ import { AboutSection } from './components/AboutSection';
 import { StudyAbroadSection } from './components/StudyAbroadSection';
 import { ExploreCountrySection } from './components/ExploreCountrySection';
 import { SchengenSection } from './components/SchengenSection';
-import { GallerySection } from './components/GallerySection';
 import { ContactSection } from './components/ContactSection';
 import { NewsSection } from './components/NewsSection';
 import { AdminPanelSection } from './components/AdminPanelSection';
@@ -35,8 +34,61 @@ export default function App() {
     return INITIAL_NEWS_POSTS;
   });
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
+  const [sharedCountries, setSharedCountries] = useState<any[]>([]);
+  const [sharedStories, setSharedStories] = useState<any[]>([]);
 
-  // Save news posts to localStorage whenever they change
+  // Fetch data from Supabase on mount
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.log('Supabase credentials missing, using local data');
+        return;
+      }
+
+      const { supabase } = await import('./lib/supabase');
+      if (!supabase) return;
+
+      try {
+        // Fetch News
+        const { data: newsData } = await supabase
+          .from('news')
+          .select('*')
+          .order('date', { ascending: false });
+
+        if (newsData && newsData.length > 0) {
+          setSharedPosts(newsData.map((item: any) => ({
+            ...item,
+            highlights: typeof item.highlights === 'string' ? JSON.parse(item.highlights) : item.highlights,
+            studentDetails: typeof item.studentDetails === 'string' ? JSON.parse(item.studentDetails) : item.studentDetails,
+          })));
+        }
+
+        // Fetch Countries
+        const { data: countryData } = await supabase.from('countries').select('*');
+        if (countryData && countryData.length > 0) {
+          setSharedCountries(countryData.map((item: any) => ({
+            ...item,
+            highlights: typeof item.highlights === 'string' ? JSON.parse(item.highlights) : item.highlights,
+            intakes: typeof item.intakes === 'string' ? JSON.parse(item.intakes) : item.intakes,
+            requirements: typeof item.requirements === 'string' ? JSON.parse(item.requirements) : item.requirements,
+            popularCourses: typeof item.popularCourses === 'string' ? JSON.parse(item.popularCourses) : item.popularCourses,
+          })));
+        }
+
+        // Fetch Stories
+        const { data: storyData } = await supabase.from('success_stories').select('*');
+        if (storyData && storyData.length > 0) {
+          setSharedStories(storyData);
+        }
+      } catch (e) {
+        console.error('Failed to fetch data:', e);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Save news posts to localStorage whenever they change as a local cache fallback
   React.useEffect(() => {
     localStorage.setItem('joyfastfly_news', JSON.stringify(sharedPosts));
   }, [sharedPosts]);
@@ -129,8 +181,6 @@ export default function App() {
         );
       case 'schengen':
         return <SchengenSection setSection={setSection} setSelectedCountryId={setSelectedCountryId} />;
-      case 'gallery':
-        return <GallerySection />;
       case 'contact':
         return <ContactSection />;
       case 'admin':

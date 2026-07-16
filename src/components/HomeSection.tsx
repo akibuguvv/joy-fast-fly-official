@@ -11,7 +11,7 @@ interface HomeSectionProps {
 }
 
 export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelectedCountryId, posts, setSelectedPost }) => {
-  const countryBadges: string[] = ['ITALY', 'HUNGARY', 'POLAND'];
+  const countryBadges: string[] = ['CYPRUS', 'ROMANIA', 'SERBIA', 'GREECE'];
 
   const getVisaIcon = (iconName: string) => {
     switch (iconName) {
@@ -43,7 +43,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
       >
         {/* Dynamic Background */}
         <div 
-          className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1454496522488-7a8e7dc8e84a?q=80&w=2000')] bg-cover bg-center"
+          className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000')] bg-cover bg-center"
           id="hero-bg-image"
         ></div>
         <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-950/70 to-blue-950/90 z-0"></div>
@@ -83,7 +83,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
               Joy Fast <span className="text-[#da1e28]">Fly</span>
             </h1>
             <p className="text-lg md:text-2xl font-bold text-gray-200 max-w-2xl leading-relaxed tracking-wide drop-shadow-lg mt-2" id="hero-welcome-sub">
-              Expert Student Visa processing and immigration consultancy for Italy, Hungary, Poland, and beyond.
+              Expert Student Visa processing and immigration consultancy for Cyprus, Romania, Serbia, and Greece.
             </p>
             
             <div className="flex flex-row justify-center gap-4 mt-8 w-full">
@@ -134,7 +134,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
               
               <div className="flex flex-col gap-6 text-base text-gray-600 leading-relaxed font-medium border-l-2 border-gray-100 pl-6">
                 <p>
-                  Joy Fast Fly is one of the premier educational and visa consulting firms in Bangladesh. We facilitate and process student visas for <strong className="text-blue-950 font-black">Italy, Hungary, and Poland</strong>.
+                  Joy Fast Fly is one of the premier educational and visa consulting firms in Bangladesh. We facilitate and process student visas for <strong className="text-blue-950 font-black">Cyprus, Romania, Serbia, and Greece</strong>.
                 </p>
                 <p>
                   A faithful and reliable platform of education and visa consultancy with a stellar record of student visa, short-term study visa, and visit visa success stories across multiple global destinations.
@@ -317,7 +317,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
             <span className="text-xs text-gray-300 font-black uppercase tracking-[0.2em]">Happy Students</span>
           </div>
           <div className="flex flex-col items-center gap-2 py-4 md:border-l border-white/10">
-            <span className="text-4xl md:text-5xl font-black text-[#ff9800]">20+</span>
+            <span className="text-4xl md:text-5xl font-black text-[#ff9800]">4+</span>
             <span className="text-xs text-gray-300 font-black uppercase tracking-[0.2em]">Partner Countries</span>
           </div>
         </div>

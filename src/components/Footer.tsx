@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
             Imagine A Better Future
           </h3>
           <p className="text-sm text-gray-300 leading-relaxed font-medium">
-            Joy Fast Fly is one of the well-known and premier educational and visa consulting firms in Bangladesh. We process student visas in Canada, USA, UK, Spain, Australia, Sweden, and many more countries.
+            Joy Fast Fly is one of the well-known and premier educational and visa consulting firms in Bangladesh. We specialize in processing visas for Cyprus, Romania, Serbia, and Greece.
           </p>
           <button 
             onClick={() => handleNavClick('about')}
@@ -66,7 +66,7 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
           {/* Countries List Row */}
           <div className="flex flex-col gap-2.5 mt-2" id="footer-destinations-wrapper">
             <div className="flex flex-wrap items-center gap-4" id="footer-destinations">
-              {['Italy', 'Hungary', 'Poland'].map((country) => (
+              {['Cyprus', 'Romania', 'Serbia', 'Greece'].map((country) => (
                 <div key={country} className="bg-blue-900/40 border border-blue-800/60 px-3 py-1.5 rounded-md text-xs font-semibold" title={country}>
                   {country}
                 </div>

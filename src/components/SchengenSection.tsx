@@ -42,14 +42,13 @@ export const SchengenSection: React.FC<SchengenSectionProps> = ({ setSection, se
   ];
 
   // Filter only the Schengen countries present in our database/list of countries
-  const schengenCountryIds = ['italy', 'hungary', 'poland', 'romania'];
+  const schengenCountryIds = ['cyprus', 'romania', 'greece'];
   const countriesList = getMergedCountries();
   const exploreCountries = countriesList.filter(c => 
     schengenCountryIds.includes(c.id.toLowerCase()) || 
-    c.name.toLowerCase().includes('italy') || 
-    c.name.toLowerCase().includes('hungary') || 
-    c.name.toLowerCase().includes('poland') || 
-    c.name.toLowerCase().includes('romania') ||
+    c.name.toLowerCase().includes('cyprus') || 
+    c.name.toLowerCase().includes('romania') || 
+    c.name.toLowerCase().includes('greece') || 
     c.highlights.some(h => h.toLowerCase().includes('schengen'))
   );
 

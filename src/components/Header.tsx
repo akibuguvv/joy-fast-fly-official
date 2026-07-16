@@ -40,9 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     { id: 'explore-country', label: 'Explore Country' },
     { id: 'schengen', label: 'Schengen Zone' },
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'contact', label: 'Register Online' },
-    { id: 'admin', label: 'Admin Panel' }
+    { id: 'contact', label: 'Register Online' }
   ];
 
   const handleNavClick = (sectionId: string, dropdownValue?: string) => {

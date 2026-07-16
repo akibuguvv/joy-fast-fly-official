@@ -348,17 +348,31 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   };
 
   // 2. Fetch Success Stories (removing demo items)
-  const fetchStories = () => {
-    const saved = localStorage.getItem('joyfastfly_stories');
-    if (saved) {
+  const fetchStories = async () => {
+    let dbStories: SuccessStory[] = [];
+    if (supabase) {
       try {
-        const loaded = JSON.parse(saved);
-        const filtered = loaded.filter((item: any) => !['1', '2', '3', '4', '5'].includes(item.id) || !item.name.includes('Rahim'));
-        setSuccessStories(filtered);
-        return;
+        const { data, error } = await supabase.from('success_stories').select('*');
+        if (!error && data) dbStories = data;
       } catch (e) {}
     }
-    setSuccessStories([]);
+
+    const saved = localStorage.getItem('joyfastfly_stories');
+    let localStories: SuccessStory[] = [];
+    if (saved) {
+      try {
+        localStories = JSON.parse(saved);
+      } catch (e) {}
+    }
+
+    const merged = [...dbStories];
+    const dbIds = new Set(dbStories.map(s => s.id));
+    localStories.forEach(s => {
+      if (!dbIds.has(s.id)) merged.push(s);
+    });
+
+    const filtered = merged.filter((item: any) => !['1', '2', '3', '4', '5'].includes(item.id) || !item.name.includes('Rahim'));
+    setSuccessStories(filtered);
   };
 
   // 3. Fetch Applications (removing demo items & automatically mirroring from online inquiries)
@@ -401,8 +415,32 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   };
 
   // 4. Fetch Countries
-  const fetchCountries = () => {
-    setCountries(getMergedCountries(true));
+  const fetchCountries = async () => {
+    let dbCountries: CountryInfo[] = [];
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('countries').select('*');
+        if (!error && data) dbCountries = data;
+      } catch (e) {}
+    }
+
+    const baseCountries = getMergedCountries(true);
+    const merged = [...baseCountries];
+    const baseIds = new Set(baseCountries.map(c => c.id.toLowerCase()));
+
+    dbCountries.forEach(c => {
+      if (!baseIds.has(c.id.toLowerCase())) {
+        merged.push({
+          ...c,
+          highlights: typeof c.highlights === 'string' ? JSON.parse(c.highlights) : c.highlights,
+          intakes: typeof c.intakes === 'string' ? JSON.parse(c.intakes) : c.intakes,
+          requirements: typeof c.requirements === 'string' ? JSON.parse(c.requirements) : c.requirements,
+          popularCourses: typeof c.popularCourses === 'string' ? JSON.parse(c.popularCourses) : c.popularCourses,
+        });
+      }
+    });
+
+    setCountries(merged);
   };
 
   const fetchLinks = () => {
@@ -556,25 +594,56 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
         highlights: newsShortDescription ? [newsShortDescription] : []
       };
 
+      // Save to Supabase if available
+      if (supabase) {
+        supabase
+          .from('news')
+          .insert([{
+            ...newPost,
+            highlights: JSON.stringify(newPost.highlights),
+            studentDetails: JSON.stringify(newPost.studentDetails || {})
+          }])
+          .then(({ error }) => {
+            if (error) console.error('Error saving news to Supabase:', error);
+          });
+      }
+
       setPosts(prev => [newPost, ...prev]);
       alert('News published successfully!');
     } else if (newsSubView === 'edit' && editingPostId) {
       // Edit news post
+      const updatedPostData: any = {
+        title: newsTitle,
+        body: newsBody,
+        category: newsCategory,
+        date: newsPublishDate,
+        isFeatured: isFeatured,
+        readTime: readTime,
+        highlights: newsShortDescription ? [newsShortDescription] : [],
+        fileType: determinedFileType,
+        mediaUrl: finalMediaUrl
+      };
+
+      // Save to Supabase if available
+      if (supabase) {
+        supabase
+          .from('news')
+          .update({
+            ...updatedPostData,
+            highlights: JSON.stringify(updatedPostData.highlights),
+            studentDetails: JSON.stringify(updatedPostData.studentDetails || {})
+          })
+          .eq('id', editingPostId)
+          .then(({ error }) => {
+            if (error) console.error('Error updating news in Supabase:', error);
+          });
+      }
+
       setPosts(prev => prev.map(post => {
         if (post.id === editingPostId) {
-          // If no new media is specified, retain old values
-          const hasNewMedia = newsFile || newsVideoUrl || newsFileUrl;
           return {
             ...post,
-            title: newsTitle,
-            body: newsBody,
-            category: newsCategory,
-            date: newsPublishDate || post.date,
-            isFeatured: isFeatured,
-            readTime: readTime,
-            highlights: newsShortDescription ? [newsShortDescription] : post.highlights,
-            fileType: hasNewMedia ? determinedFileType : (post.fileType || 'image'),
-            mediaUrl: hasNewMedia ? finalMediaUrl : post.mediaUrl
+            ...updatedPostData
           };
         }
         return post;
@@ -612,6 +681,16 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
       'Delete News Post',
       'Are you sure you want to delete this news post? This action cannot be undone.',
       () => {
+        // Delete from Supabase if available
+        if (supabase) {
+          supabase
+            .from('news')
+            .delete()
+            .eq('id', id)
+            .then(({ error }) => {
+              if (error) console.error('Error deleting news from Supabase:', error);
+            });
+        }
         setPosts(prev => prev.filter(post => post.id !== id));
       }
     );
@@ -771,6 +850,22 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     const updatedAdded = [...added.filter(c => c.id.toLowerCase() !== countryId), newCountry];
     localStorage.setItem('joyfastfly_countries_added', JSON.stringify(updatedAdded));
     
+    // Save to Supabase if available
+    if (supabase) {
+      supabase
+        .from('countries')
+        .insert([{
+          ...newCountry,
+          highlights: JSON.stringify(newCountry.highlights),
+          intakes: JSON.stringify(newCountry.intakes),
+          requirements: JSON.stringify(newCountry.requirements),
+          popularCourses: JSON.stringify(newCountry.popularCourses)
+        }])
+        .then(({ error }) => {
+          if (error) console.error('Error saving country to Supabase:', error);
+        });
+    }
+
     setNewCountryName('');
     setNewCountryCode('');
     setNewCountryHighlights('');
@@ -796,6 +891,17 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
       'Delete Country',
       'Are you sure you want to delete this custom added country from the directory?',
       () => {
+        // Delete from Supabase if available
+        if (supabase) {
+          supabase
+            .from('countries')
+            .delete()
+            .eq('id', id)
+            .then(({ error }) => {
+              if (error) console.error('Error deleting country from Supabase:', error);
+            });
+        }
+
         const saved = localStorage.getItem('joyfastfly_countries_added');
         const added: CountryInfo[] = saved ? JSON.parse(saved) : [];
         const updated = added.filter(item => item.id.toLowerCase() !== id.toLowerCase());
@@ -865,6 +971,17 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     const updated = [newItem, ...successStories];
     setSuccessStories(updated);
     localStorage.setItem('joyfastfly_stories', JSON.stringify(updated));
+
+    // Save to Supabase if available
+    if (supabase) {
+      supabase
+        .from('success_stories')
+        .insert([newItem])
+        .then(({ error }) => {
+          if (error) console.error('Error saving success story to Supabase:', error);
+        });
+    }
+
     setNewStoryName('');
     setShowAddStoryModal(false);
   };
@@ -874,6 +991,16 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
       'Delete Success Story',
       'Are you sure you want to delete this success story?',
       () => {
+        // Delete from Supabase if available
+        if (supabase) {
+          supabase
+            .from('success_stories')
+            .delete()
+            .eq('id', id)
+            .then(({ error }) => {
+              if (error) console.error('Error deleting success story from Supabase:', error);
+            });
+        }
         const updated = successStories.filter(item => item.id !== id);
         setSuccessStories(updated);
         localStorage.setItem('joyfastfly_stories', JSON.stringify(updated));
@@ -1123,6 +1250,15 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                     ) : activeTab}
                   </span>
                 </h1>
+                <a 
+                  href="https://joyfastfly.vercel.app/admin" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-blue-100 hover:bg-blue-100 transition-all ml-2"
+                >
+                  <Globe size={12} />
+                  Main Admin Panel
+                </a>
               </div>
 
               {/* RIGHT HEADER CONTROLS */}

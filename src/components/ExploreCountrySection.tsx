@@ -154,19 +154,12 @@ Web: joyfastfly.com`;
           currency: 'Euro (EUR)',
           intakes: 'Jan, May, Sep'
         };
-      case 'italy':
+      case 'greece':
         return {
           subtitle: 'Schengen Zone Member',
-          language: 'English / Italian',
+          language: 'Greek / English',
           currency: 'Euro (EUR)',
-          intakes: 'Feb, Sep'
-        };
-      case 'hungary':
-        return {
-          subtitle: 'Schengen Zone Member',
-          language: 'English',
-          currency: 'Euro (EUR) / HUF',
-          intakes: 'Feb, Sep'
+          intakes: 'Feb, Sep, Oct'
         };
       case 'serbia':
         return {
@@ -180,13 +173,6 @@ Web: joyfastfly.com`;
           subtitle: 'European Union Member',
           language: 'English / Romanian',
           currency: 'Romanian Leu (RON)',
-          intakes: 'All Year Round'
-        };
-      case 'poland':
-        return {
-          subtitle: 'Schengen Zone Member',
-          language: 'English / Polish',
-          currency: 'Polish Zloty (PLN)',
           intakes: 'All Year Round'
         };
       default:
@@ -701,7 +687,7 @@ Web: joyfastfly.com`;
                 <Search size={18} className="text-slate-400 shrink-0" />
                 <input
                   type="text"
-                  placeholder="Search your dream country (Italy, Hungary, Poland...)"
+                  placeholder="Search your dream country (Cyprus, Romania, Serbia...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-transparent border-0 focus:ring-0 focus:outline-hidden pl-3 py-2 text-sm font-semibold text-slate-800 placeholder-slate-400"

@@ -68,65 +68,24 @@ export const COUNTRIES: CountryInfo[] = [
     visaType: 'work'
   },
   {
-    id: 'italy',
-    name: 'Italy',
-    code: 'IT',
-    flagUrl: 'https://flagcdn.com/w320/it.png',
-    bgImage: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200',
+    id: 'greece',
+    name: 'Greece',
+    code: 'GR',
+    flagUrl: 'https://flagcdn.com/w320/gr.png',
+    bgImage: 'https://images.unsplash.com/photo-1503152394-c571994fd383?q=80&w=1200',
     highlights: [
-      'Top ranked universities with affordable tuition and scholarships.',
-      'Opportunity to get 100% tuition fee waiver and stipend',
-      'Easy pathway for Schengen student visa without IELTS under MOI'
+      'Official Work Permit for Agriculture and seasonal sectors.',
+      'Stable European employment with social security (EFKA)',
+      'Opportunities in Farming, Hospitality, and Construction',
+      'Legal residency pathway with renewable work contracts'
     ],
-    intakes: ['2 - 4 Months'],
+    intakes: ['3 - 5 Months'],
     requirements: {
-      education: 'Minimum HSC Completed with good GPA, or Bachelor Degree',
-      ielts: 'No IELTS',
-      funds: 'Moderate bank statement or scholarship waiver options'
-    },
-    popularCourses: ['Engineering', 'Computer Science', 'Business & Economics', 'Fashion Design'],
-    tuitionFee: 'Up to 100% Scholarship',
-    visaType: 'student'
-  },
-  {
-    id: 'hungary',
-    name: 'Hungary',
-    code: 'HU',
-    flagUrl: 'https://flagcdn.com/w320/hu.png',
-    bgImage: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200',
-    highlights: [
-      'Quality education in Europe at an affordable cost.',
-      'Schengen Member state with full travel rights',
-      'Part-time job rights and simple post-study work pathways'
-    ],
-    intakes: ['3 - 4 Months'],
-    requirements: {
-      education: 'SSC/HSC Completed (GPA 3.00+)',
-      ielts: 'No IELTS',
-      funds: 'Approx. €5,000 - 8,000 bank balance solvency'
-    },
-    popularCourses: ['Business Management', 'Software Engineering', 'Tourism', 'Medicine'],
-    tuitionFee: '€2,500 - 4,500 / year',
-    visaType: 'student'
-  },
-  {
-    id: 'poland',
-    name: 'Poland',
-    code: 'PL',
-    flagUrl: 'https://flagcdn.com/w320/pl.png',
-    bgImage: 'https://images.unsplash.com/photo-1519197924294-4ba991a11128?q=80&w=1200',
-    highlights: [
-      'High demand jobs with easy work visa process.',
-      'Stable EU Economy with legal renewable residence cards (TRC)',
-      'No hidden taxes, straightforward medical and social insurance'
-    ],
-    intakes: ['3 - 6 Months'],
-    requirements: {
-      education: 'Class 8 / SSC completed or equivalent practical skills',
+      education: 'Minimum Class 8 or SSC completed. Practical experience in relevant field.',
       ielts: 'No IELTS Required',
-      funds: 'Flexible contract fees'
+      funds: 'Processing fees apply. Minimal financial documentation needed.'
     },
-    popularCourses: ['Factory Packers', 'Warehouse Assistant', 'Welders & Construction', 'Drivers'],
+    popularCourses: ['Agriculture & Harvesting', 'Hotel & Restaurant Services', 'Construction Help', 'Manufacturing'],
     tuitionFee: 'Contract/Processing fees apply',
     visaType: 'work'
   }
@@ -298,11 +257,67 @@ export const PARTNERS = [
 
 export const GALLERY_ITEMS = [
   {
+    id: 1,
+    category: 'Visa Success',
+    title: 'Passport Handover Ceremony',
+    studentName: 'Shamim ur Rahman',
+    university: 'European University Cyprus',
+    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 2,
+    category: 'Visa Success',
+    title: 'Schengen Student Visa Success',
+    studentName: 'Tahmid Hasan',
+    university: 'University of Debrecen, Hungary',
+    imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 3,
+    category: 'Student Activities',
+    title: 'Pre-Departure Orientation Program',
+    studentName: 'Fall Intake',
+    university: 'Joy Fast Fly Dhaka Office',
+    imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&q=80&w=600'
+  },
+  {
     id: 4,
     category: 'Student Activities',
-    title: 'Joy Fast Fly Pre-Departure Seminar',
-    studentName: 'Fall Intake',
+    title: 'IELTS Preparation & Class Discussion',
+    studentName: 'Weekend Batch',
+    university: 'IELTS Center',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 5,
+    category: 'Campus Life',
+    title: 'International Student Gathering on Campus',
+    studentName: 'Campus Life',
+    university: 'Schengen Area University',
+    imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 6,
+    category: 'Campus Life',
+    title: 'Group Study at University Library',
+    studentName: 'Campus Life',
+    university: 'European Campus Library',
+    imageUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 7,
+    category: 'Office Events',
+    title: 'Joy Fast Fly Seminar with Delegates',
+    studentName: 'Seminar Event',
     university: 'Dhaka Office',
-    imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=400'
+    imageUrl: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80&w=600'
+  },
+  {
+    id: 8,
+    category: 'Office Events',
+    title: 'Career & Study Abroad Consultation Day',
+    studentName: 'Consultation Day',
+    university: 'Head Office',
+    imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=600'
   }
 ];
