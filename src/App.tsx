@@ -44,6 +44,12 @@ export default function App() {
 
   // Fetch data from Supabase on mount
   React.useEffect(() => {
+    // Check for ?admin=true query parameter to open admin panel directly
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true') {
+      setSection('admin');
+    }
+
     const fetchData = async () => {
       if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
         console.log('Supabase credentials missing, using local data');
