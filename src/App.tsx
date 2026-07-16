@@ -37,7 +37,7 @@ export default function App() {
   const [sharedCountries, setSharedCountries] = useState<any[]>([]);
   const [sharedStories, setSharedStories] = useState<any[]>([]);
   const [siteSettings, setSiteSettings] = useState<any>({
-    logo_url: '/logo.png',
+    logo_url: 'https://olpugarjjqetizpjtfeq.supabase.co/storage/v1/object/public/assets/logo.png',
     favicon_url: '/favicon.ico',
     hero_banner_url: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000'
   });

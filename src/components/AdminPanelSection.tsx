@@ -9,6 +9,7 @@ import {
   FileSpreadsheet,
   Inbox,
   Image as ImageIcon,
+  Layout,
   Bell,
   Layers,
   Home as HomeIcon,
@@ -106,7 +107,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [isUploading, setIsUploading] = useState(false);
 
   // Assets State
-  const [logoUrl, setLogoUrl] = useState<string>('/logo.png');
+  const [logoUrl, setLogoUrl] = useState<string>('https://olpugarjjqetizpjtfeq.supabase.co/storage/v1/object/public/assets/logo.png');
   const [faviconUrl, setFaviconUrl] = useState<string>('/favicon.ico');
   const [heroBannerUrl, setHeroBannerUrl] = useState<string>('https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000');
 
@@ -1156,7 +1157,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     { id: 'applications', label: 'Applications', icon: FileSpreadsheet },
     { id: 'inquiries', label: 'Inquiries', icon: Inbox },
     { id: 'pdfs', label: 'Country PDFs', icon: Upload },
-    { id: 'assets', label: 'Website Assets', icon: Image },
   ];
 
   return (
@@ -3047,7 +3047,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
               )}
 
               {/* TAB 7: LINKS */}
-              {activeTab === 'false' && (
+              {activeTab === 'links' && (
                 <div className="flex flex-col gap-6 animate-fade-in text-left">
                   <div className="flex items-center justify-between">
                     <div>
@@ -3771,7 +3771,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                     <div className="bg-white border border-gray-150 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col gap-6">
                       <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
-                          <Image size={20} />
+                          <ImageIcon size={20} />
                         </div>
                         <h3 className="font-black text-blue-950 text-base">Main Logo</h3>
                       </div>

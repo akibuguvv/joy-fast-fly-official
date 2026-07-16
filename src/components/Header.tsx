@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
     { 
       id: 'study-abroad', 
       label: 'Study Abroad',
-      dropdown: ['Italy', 'Hungary']
+      dropdown: ['Scholarships', 'Visas', 'Universities']
     },
     {
       id: 'news',
@@ -37,8 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       id: 'work-abroad',
-      label: 'Work Permits',
-      dropdown: ['Poland']
+      label: 'Work Permits'
     },
     { id: 'explore-country', label: 'Explore Country' },
     { id: 'schengen', label: 'Schengen Zone' },
@@ -121,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Main Navigation Bar */}
       <nav className="bg-white border-b border-gray-100 shadow-sm relative z-30" id="primary-navbar">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-18 flex items-center justify-between">
           {/* Logo */}
           <div className="cursor-pointer relative z-30" onClick={() => handleNavClick('home')} id="nav-logo-trigger">
             <JtecLogo logoUrl={logoUrl} />
