@@ -47,7 +47,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
           style={{ backgroundImage: `url(${heroBanner || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2000'})` }}
           id="hero-bg-image"
         ></div>
-        <div className="absolute inset-0 bg-blue-500/30 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/85 via-blue-900/70 to-blue-950/85 z-0"></div>
 
         <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center gap-6">
           
