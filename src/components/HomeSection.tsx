@@ -12,7 +12,6 @@ interface HomeSectionProps {
 }
 
 export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelectedCountryId, posts, setSelectedPost, heroBanner }) => {
-  const countryBadges: string[] = ['CYPRUS', 'ROMANIA', 'SERBIA', 'GREECE'];
 
   const getVisaIcon = (iconName: string) => {
     switch (iconName) {
@@ -39,73 +38,62 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
       
       {/* 1. Hero Section */}
       <section 
-        className="relative h-[80vh] min-h-[600px] flex flex-col items-center justify-center text-center px-4 overflow-hidden"
+        className="relative h-[60vh] min-h-[450px] flex flex-col items-center justify-center text-center px-4 overflow-hidden"
         id="hero-banner"
       >
         {/* Dynamic Background */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroBanner || 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000'})` }}
+          style={{ backgroundImage: `url(${heroBanner || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2000'})` }}
           id="hero-bg-image"
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-950/70 to-blue-950/90 z-0"></div>
+        <div className="absolute inset-0 bg-blue-500/30 z-0"></div>
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center gap-6">
           
-          {/* Floating Country Badges */}
-          <div className="flex flex-wrap justify-center gap-4" id="hero-country-badges">
-            {countryBadges.map((country, idx) => {
-              const countryId = country === 'UK' ? 'uk' : country.toLowerCase();
-              return (
-                <button 
-                  key={idx}
-                  onClick={() => {
-                    if (setSelectedCountryId) {
-                      setSelectedCountryId(countryId);
-                    }
-                    setSection('study-abroad');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white font-black text-xs md:text-sm tracking-widest px-6 py-2.5 rounded-sm shadow-lg hover:-translate-y-1 transition-all text-center uppercase"
-                  style={{ animationDelay: `${idx * 150}ms` }}
-                  id={`hero-badge-${countryId}`}
-                >
-                  {country}
-                </button>
-              );
-            })}
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-none uppercase drop-shadow-2xl" id="hero-welcome-title">
+            Joy Fast <span className="text-[#da1e28]">Fly</span>
+          </h1>
+
+          {/* Contact Information */}
+          <div className="flex flex-col gap-4 text-white text-sm md:text-base font-bold drop-shadow-md" id="hero-contact-info">
+            <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+              <div className="flex items-center gap-3">
+                <span className="text-[#ff9800]">📞</span>
+                <span>+880 1746-983358 (মোহাম্মদ আতিক মোল্লা - ডিরেক্টর)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[#ff9800]">📞</span>
+                <span>01944554355 (এবিএম মশিউর রহমান - ডিরেক্টর)</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 justify-center">
+              <span className="text-[#ff9800]">✉️</span>
+              <span>joyfastfly@gmail.com</span>
+            </div>
           </div>
 
           {/* Hero Headline content */}
-          <div className="flex flex-col items-center gap-5" id="hero-text-content">
-            <span className="text-[#ff9800] text-sm md:text-base font-black uppercase tracking-[0.3em] drop-shadow-md">
-              Your Gateway to Global Education
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-none uppercase drop-shadow-2xl" id="hero-welcome-title">
-              Joy Fast <span className="text-[#da1e28]">Fly</span>
-            </h1>
-            <p className="text-lg md:text-2xl font-bold text-gray-200 max-w-2xl leading-relaxed tracking-wide drop-shadow-lg mt-2" id="hero-welcome-sub">
-              Expert Student Visa processing and immigration consultancy for Cyprus, Romania, Serbia, and Greece.
-            </p>
+          <div className="flex flex-col items-center gap-5 mt-4" id="hero-text-content">
             
-            <div className="flex flex-row justify-center gap-4 mt-8 w-full">
+            <div className="flex flex-row justify-center gap-4 mt-6 w-full">
               <button 
                 onClick={() => {
                   setSection('about');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="flex-1 sm:flex-none px-4 sm:px-8 py-3.5 bg-[#da1e28] text-white font-black uppercase tracking-widest rounded-sm shadow-xl hover:bg-red-700 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs border-b-4 border-red-900 flex justify-center items-center gap-2"
+                className="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 bg-[#da1e28] text-white font-black uppercase tracking-widest rounded-sm shadow-xl hover:bg-red-700 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs border-b-4 border-red-900 flex justify-center items-center gap-2"
                 id="hero-learn-more-btn"
               >
                 Learn More
-                <ArrowRight size={16} />
+                <ArrowRight size={14} />
               </button>
               <button 
                 onClick={() => {
                   setSection('contact');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="flex-1 sm:flex-none px-4 sm:px-8 py-3.5 bg-white text-blue-950 font-black uppercase tracking-widest rounded-sm shadow-xl hover:bg-gray-100 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs border-b-4 border-gray-300 flex justify-center items-center gap-2"
+                className="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 bg-white text-blue-950 font-black uppercase tracking-widest rounded-sm shadow-xl hover:bg-gray-100 hover:-translate-y-0.5 transition-all text-[10px] sm:text-xs border-b-4 border-gray-300 flex justify-center items-center gap-2"
                 id="hero-apply-btn"
               >
                 Apply Now

@@ -28,7 +28,7 @@ export const COUNTRIES: CountryInfo[] = [
     name: 'Serbia',
     code: 'RS',
     flagUrl: 'https://flagcdn.com/w320/rs.png',
-    bgImage: 'https://images.unsplash.com/photo-1555979864-747248e21e25?q=80&w=1200',
+    bgImage: 'https://images.unsplash.com/photo-1536690466488-8889a74421d0?q=80&w=1200',
     highlights: [
       'Official work permit with guaranteed salary and easy process.',
       'Renewable employment visa with guaranteed monthly salary',
@@ -50,7 +50,7 @@ export const COUNTRIES: CountryInfo[] = [
     name: 'Romania',
     code: 'RO',
     flagUrl: 'https://flagcdn.com/w320/ro.png',
-    bgImage: 'https://images.unsplash.com/photo-1568291843233-64e0023a8542?q=80&w=1200',
+    bgImage: 'https://images.unsplash.com/photo-1566838217618-99c5055aef1c?q=80&w=1200',
     highlights: [
       'Europe Work Permit with great job opportunities.',
       'Excellent employment opportunities with legal contracts',
