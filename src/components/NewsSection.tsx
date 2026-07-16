@@ -22,6 +22,48 @@ import {
   MessageCircle
 } from 'lucide-react';
 
+const getYoutubeThumbnail = (url: string): string | null => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://img.youtube.com/vi/${match[2]}/hqdefault.jpg`;
+  }
+  return null;
+};
+
+const MediaPreview: React.FC<{ post: NewsPost; className?: string; iconSize?: number }> = ({ post, className = "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105", iconSize = 36 }) => {
+  if (post.fileType === 'image') {
+    return (
+      <img 
+        src={post.mediaUrl} 
+        alt={post.title} 
+        className={className} 
+      />
+    );
+  } else {
+    const ytThumb = getYoutubeThumbnail(post.mediaUrl);
+    if (ytThumb) {
+      return (
+        <div className="relative w-full h-full overflow-hidden">
+          <img src={ytThumb} alt={post.title} className={className} />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors duration-300">
+            <PlayCircle size={iconSize} className="text-white drop-shadow-md" />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="relative w-full h-full overflow-hidden">
+        <video src={post.mediaUrl} className={className} muted playsInline />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors duration-300">
+          <PlayCircle size={iconSize} className="text-white drop-shadow-md" />
+        </div>
+      </div>
+    );
+  }
+};
+
 interface NewsSectionProps {
   category: string | null;
   posts: NewsPost[];
@@ -239,7 +281,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
               {/* Title, Date and Metas */}
               <div className="flex flex-col gap-4">
-                <span className="text-[#da1e28] text-sm font-black uppercase tracking-widest">{selectedPost.category}</span>
+                <span className="inline-flex items-center px-3 py-1 text-[11px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-full w-fit">
+                  {selectedPost.category}
+                </span>
                 <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">
                   {selectedPost.title}
                 </h1>
@@ -275,12 +319,44 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               </div>
 
               {/* Big Featured Cover Image */}
-              <div className="relative w-full aspect-[16/9] bg-gray-100 mt-2">
+              <div className="relative w-full aspect-[16/9] bg-gray-100 mt-2 shadow-sm rounded-xl overflow-hidden">
                 {selectedPost.fileType === 'image' ? (
                   <img src={selectedPost.mediaUrl} alt={selectedPost.title} className="w-full h-full object-cover" />
-                ) : (
-                  <video src={selectedPost.mediaUrl} controls autoPlay className="w-full h-full object-cover" />
-                )}
+                ) : (() => {
+                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                  const match = selectedPost.mediaUrl?.match(regExp);
+                  const youtubeId = (match && match[2].length === 11) ? match[2] : null;
+                  
+                  const vimeoReg = /vimeo\.com\/(\d+)/;
+                  const vimeoMatch = selectedPost.mediaUrl?.match(vimeoReg);
+                  const vimeoId = vimeoMatch ? vimeoMatch[1] : null;
+
+                  if (youtubeId) {
+                    return (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${youtubeId}`}
+                        title={selectedPost.title}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    );
+                  } else if (vimeoId) {
+                    return (
+                      <iframe
+                        src={`https://player.vimeo.com/video/${vimeoId}`}
+                        title={selectedPost.title}
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                      />
+                    );
+                  } else {
+                    return (
+                      <video src={selectedPost.mediaUrl} controls className="w-full h-full object-cover" />
+                    );
+                  }
+                })()}
               </div>
 
               {/* Highlights section (if present) */}
@@ -338,7 +414,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-8">
                 <img src="https://images.unsplash.com/photo-1517400508447-f8dd518b86db?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
                 <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
-                <img src="https://images.unsplash.com/photo-1563294371-2b638848f1ea?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
+                <img src="https://images.unsplash.com/photo-1555979864-747248e21e25?q=80&w=300" alt="Joy Fast Fly Gallery" className="w-full h-40 md:h-32 object-cover bg-gray-100" />
               </div>
 
               {/* Footer navigation for post swapping */}
@@ -412,12 +488,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       onClick={() => setSelectedPost(post)}
                       className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden">
-                        {post.fileType === 'image' ? (
-                          <img src={post.mediaUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <video src={post.mediaUrl} className="w-full h-full object-cover" />
-                        )}
+                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative">
+                        <MediaPreview post={post} iconSize={18} />
                       </div>
                       <div className="flex flex-col flex-1">
                         <span className="text-[10px] text-gray-500 font-bold mb-1">{post.date}</span>
@@ -519,44 +591,34 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                         <div 
                           key={post.id}
                           onClick={() => setSelectedPost(post)}
-                          className="group cursor-pointer flex flex-col gap-4 border-b border-gray-100 pb-6 last:border-0"
+                          className="group cursor-pointer flex flex-col bg-white border border-gray-150/80 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-0.5"
                           id={`news-card-${post.id}`}
                         >
-                          {/* Image preview */}
-                          <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
-                            {post.fileType === 'image' ? (
-                              <img 
-                                src={post.mediaUrl} 
-                                alt={post.title} 
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                              />
-                            ) : (
-                              <div className="relative w-full h-full">
-                                <video src={post.mediaUrl} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                  <PlayCircle size={32} className="text-white opacity-85" />
-                                </div>
-                              </div>
-                            )}
+                          {/* Image/Video preview */}
+                          <div className="relative aspect-[16/10] overflow-hidden bg-gray-50 border-b border-gray-100">
+                            <MediaPreview post={post} iconSize={36} />
                           </div>
 
                           {/* Content summary */}
-                          <div className="flex flex-col flex-grow text-left justify-between gap-3">
+                          <div className="flex flex-col flex-grow text-left p-5 justify-between gap-4">
                             <div className="flex flex-col gap-2">
-                              <span className="text-[10px] font-black text-[#da1e28] uppercase tracking-wider">
+                              <span className="inline-flex items-center px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-full w-fit">
                                 {post.category}
                               </span>
-                              <h3 className="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">
+                              <h3 className="text-base font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">
                                 {post.title}
                               </h3>
-                              <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                              <p className="text-gray-500 text-xs leading-relaxed line-clamp-2 font-medium">
                                 {post.body}
                               </p>
                             </div>
 
-                            <div className="flex items-center justify-between mt-1">
+                            <div className="flex items-center justify-between border-t border-gray-50 pt-3">
                               <span className="text-[10px] font-bold text-gray-400 uppercase">
                                 {post.date}
+                              </span>
+                              <span className="text-blue-600 font-extrabold text-[10px] uppercase tracking-wider group-hover:underline flex items-center gap-1">
+                                Read More <ArrowRight size={10} />
                               </span>
                             </div>
                           </div>
@@ -622,20 +684,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                         >
                           {/* Left: Thumbnail container */}
                           <div className="w-full md:w-64 aspect-[3/2] relative overflow-hidden bg-gray-100 shrink-0">
-                            {post.fileType === 'image' ? (
-                              <img 
-                                src={post.mediaUrl} 
-                                alt={post.title} 
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                              />
-                            ) : (
-                              <div className="relative w-full h-full">
-                                <video src={post.mediaUrl} className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                  <PlayCircle size={24} className="text-white" />
-                                </div>
-                              </div>
-                            )}
+                            <MediaPreview post={post} iconSize={24} />
                           </div>
 
                           {/* Right: details info */}
@@ -723,12 +772,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
                       onClick={() => setSelectedPost(post)}
                       className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
                     >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden">
-                        {post.fileType === 'image' ? (
-                          <img src={post.mediaUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <video src={post.mediaUrl} className="w-full h-full object-cover" />
-                        )}
+                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative">
+                        <MediaPreview post={post} iconSize={18} />
                       </div>
                       <div className="flex flex-col flex-1 text-left">
                         <span className="text-[10px] text-[#da1e28] font-bold mb-1 uppercase">{post.category}</span>

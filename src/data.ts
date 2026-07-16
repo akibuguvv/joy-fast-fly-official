@@ -8,15 +8,15 @@ export const COUNTRIES: CountryInfo[] = [
     flagUrl: 'https://flagcdn.com/w320/cy.png',
     bgImage: 'https://images.unsplash.com/photo-1517400508447-f8dd518b86db?q=80&w=1200',
     highlights: [
-      'Affordable tuition fees in a beautiful Mediterranean European island',
+      'Affordable tuition with beautiful lifestyle and high visa success rate.',
       'Option to study without IELTS under MOI or college test',
       'Excellent hospitality and business management pathways',
       'Part-time job rights (up to 20 hours/week) for international students'
     ],
-    intakes: ['September', 'February', 'June'],
+    intakes: ['2 - 3 Months'],
     requirements: {
       education: 'Minimum HSC / Alim completed (GPA 2.50+)',
-      ielts: 'Not mandatory; Medium of Instruction (MOI) or college test accepted',
+      ielts: 'No IELTS',
       funds: 'Bank statement of approx. €4,500 to €6,000 (Very simple documentation)'
     },
     popularCourses: ['Hotel & Tourism Management', 'Business Administration', 'Culinary Arts', 'Computer Science'],
@@ -28,17 +28,17 @@ export const COUNTRIES: CountryInfo[] = [
     name: 'Serbia',
     code: 'RS',
     flagUrl: 'https://flagcdn.com/w320/rs.png',
-    bgImage: 'https://images.unsplash.com/photo-1563294371-2b638848f1ea?q=80&w=1200',
+    bgImage: 'https://images.unsplash.com/photo-1555979864-747248e21e25?q=80&w=1200',
     highlights: [
-      'Official European Work Permit & Job Contract (দক্ষ শ্রমিক)',
+      'Official work permit with guaranteed salary and easy process.',
       'Renewable employment visa with guaranteed monthly salary',
       'Great path to live and work in the European continent',
       'Free or subsidized accommodation provided by many employers'
     ],
-    intakes: ['Processing: 2 - 3 Months'],
+    intakes: ['2 - 3 Months'],
     requirements: {
       education: 'Minimum Class 8 / JSC or SSC completed. Practical work experience is highly preferred.',
-      ielts: 'No IELTS Required (Basic English or Bengali communication)',
+      ielts: 'No IELTS Required',
       funds: 'No block funds or massive solvency proof. Low, flexible contract processing fees.'
     },
     popularCourses: ['Construction & Masonry', 'Factory & Packing Workers', 'Professional Drivers', 'Agriculture & Farms'],
@@ -50,17 +50,17 @@ export const COUNTRIES: CountryInfo[] = [
     name: 'Romania',
     code: 'RO',
     flagUrl: 'https://flagcdn.com/w320/ro.png',
-    bgImage: 'https://images.unsplash.com/photo-1543831809-1e355c4d1565?q=80&w=1200',
+    bgImage: 'https://images.unsplash.com/photo-1568291843233-64e0023a8542?q=80&w=1200',
     highlights: [
-      'European Union Work Permit (দক্ষ শ্রমিক)',
+      'Europe Work Permit with great job opportunities.',
       'Excellent employment opportunities with legal contracts',
       'Free accommodation, food allowance, and health insurance provided',
       'Highly stable pathway with simple documents and high visa success rate'
     ],
-    intakes: ['Processing: 3 - 4 Months'],
+    intakes: ['3 - 4 Months'],
     requirements: {
       education: 'SSC completed or practical work experience (Must send a short work demonstration video)',
-      ielts: 'No IELTS required; practical skill test/video demonstration is key',
+      ielts: 'No IELTS Required',
       funds: 'Flexible and secure processing fee. No bank statement or solvent block funds needed.'
     },
     popularCourses: ['Garments & Textile', 'Logistics & Warehousing', 'Food Processing & Packers', 'Construction & Masonry'],
@@ -68,28 +68,99 @@ export const COUNTRIES: CountryInfo[] = [
     visaType: 'work'
   },
   {
-    id: 'bulgaria',
-    name: 'Bulgaria',
-    code: 'BG',
-    flagUrl: 'https://flagcdn.com/w320/bg.png',
-    bgImage: 'https://images.unsplash.com/photo-1589269986333-873b88b2a1a8?q=80&w=1200',
+    id: 'italy',
+    name: 'Italy',
+    code: 'IT',
+    flagUrl: 'https://flagcdn.com/w320/it.png',
+    bgImage: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200',
     highlights: [
-      'European Union Work Permit',
-      'Stable employment opportunities with legal contracts',
-      'Path to live and work in the EU',
-      'Supported accommodation and health insurance options'
+      'Top ranked universities with affordable tuition and scholarships.',
+      'Opportunity to get 100% tuition fee waiver and stipend',
+      'Easy pathway for Schengen student visa without IELTS under MOI'
     ],
-    intakes: ['Processing: 3 - 5 Months'],
+    intakes: ['2 - 4 Months'],
     requirements: {
-      education: 'SSC completed or practical work experience',
-      ielts: 'No IELTS required',
-      funds: 'Flexible processing fees'
+      education: 'Minimum HSC Completed with good GPA, or Bachelor Degree',
+      ielts: 'No IELTS',
+      funds: 'Moderate bank statement or scholarship waiver options'
     },
-    popularCourses: ['Factory & Industrial', 'Construction', 'Logistics', 'Agriculture'],
+    popularCourses: ['Engineering', 'Computer Science', 'Business & Economics', 'Fashion Design'],
+    tuitionFee: 'Up to 100% Scholarship',
+    visaType: 'student'
+  },
+  {
+    id: 'hungary',
+    name: 'Hungary',
+    code: 'HU',
+    flagUrl: 'https://flagcdn.com/w320/hu.png',
+    bgImage: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200',
+    highlights: [
+      'Quality education in Europe at an affordable cost.',
+      'Schengen Member state with full travel rights',
+      'Part-time job rights and simple post-study work pathways'
+    ],
+    intakes: ['3 - 4 Months'],
+    requirements: {
+      education: 'SSC/HSC Completed (GPA 3.00+)',
+      ielts: 'No IELTS',
+      funds: 'Approx. €5,000 - 8,000 bank balance solvency'
+    },
+    popularCourses: ['Business Management', 'Software Engineering', 'Tourism', 'Medicine'],
+    tuitionFee: '€2,500 - 4,500 / year',
+    visaType: 'student'
+  },
+  {
+    id: 'poland',
+    name: 'Poland',
+    code: 'PL',
+    flagUrl: 'https://flagcdn.com/w320/pl.png',
+    bgImage: 'https://images.unsplash.com/photo-1519197924294-4ba991a11128?q=80&w=1200',
+    highlights: [
+      'High demand jobs with easy work visa process.',
+      'Stable EU Economy with legal renewable residence cards (TRC)',
+      'No hidden taxes, straightforward medical and social insurance'
+    ],
+    intakes: ['3 - 6 Months'],
+    requirements: {
+      education: 'Class 8 / SSC completed or equivalent practical skills',
+      ielts: 'No IELTS Required',
+      funds: 'Flexible contract fees'
+    },
+    popularCourses: ['Factory Packers', 'Warehouse Assistant', 'Welders & Construction', 'Drivers'],
     tuitionFee: 'Contract/Processing fees apply',
     visaType: 'work'
   }
 ];
+
+export const getMergedCountries = (includeInactive = false): CountryInfo[] => {
+  if (typeof window === 'undefined') return COUNTRIES;
+  try {
+    const saved = localStorage.getItem('joyfastfly_countries_added');
+    const added: CountryInfo[] = saved ? JSON.parse(saved) : [];
+    
+    const overridesSaved = localStorage.getItem('joyfastfly_countries_status_override');
+    const overrides: Record<string, boolean> = overridesSaved ? JSON.parse(overridesSaved) : {};
+    
+    const combined = [...COUNTRIES, ...added].map(c => {
+      const countryId = c.id.toLowerCase();
+      if (countryId in overrides) {
+        return { ...c, isActive: overrides[countryId] };
+      }
+      if (c.isActive === undefined) {
+        return { ...c, isActive: true };
+      }
+      return c;
+    });
+
+    if (includeInactive) {
+      return combined;
+    }
+    return combined.filter(c => c.isActive !== false);
+  } catch (e) {
+    console.error('Failed to load merged countries', e);
+    return COUNTRIES;
+  }
+};
 
 export const VISA_CATEGORIES: VisaCategory[] = [
   {
@@ -98,7 +169,7 @@ export const VISA_CATEGORIES: VisaCategory[] = [
     subtitle: 'Study in Abroad',
     description: 'Generally intended for international education pathways. We provide complete guidance from admission, offer letter, to visa success.',
     iconName: 'GraduationCap',
-    bgImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600'
+    bgImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1200'
   },
   {
     id: 'visitor',
@@ -106,7 +177,7 @@ export const VISA_CATEGORIES: VisaCategory[] = [
     subtitle: 'Visitor & Business',
     description: 'Visa that grants the hold of temporary business trips or leisure travel. Perfect for high success visa processing for conferences and family meetings.',
     iconName: 'Building',
-    bgImage: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600'
+    bgImage: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1200'
   },
   {
     id: 'visit',
@@ -114,7 +185,7 @@ export const VISA_CATEGORIES: VisaCategory[] = [
     subtitle: 'Tourism & Holiday',
     description: 'Explore breathtaking world locations or meet with loved ones. We prepare professional cover letters, travel itineraries, and financial dossiers.',
     iconName: 'PlaneTakeoff',
-    bgImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=600'
+    bgImage: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200'
   },
   {
     id: 'immigration',
@@ -122,7 +193,7 @@ export const VISA_CATEGORIES: VisaCategory[] = [
     subtitle: 'Permanent Residency',
     description: 'Immigration Visas in the field of employment-sponsored and investment-based pathways. Live and work in Canada, Australia, or Europe permanently.',
     iconName: 'Globe',
-    bgImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600'
+    bgImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1200'
   },
   {
     id: 'inquiry',
@@ -130,7 +201,7 @@ export const VISA_CATEGORIES: VisaCategory[] = [
     subtitle: 'Instant Evaluation',
     description: 'Get matched with appropriate countries, universities, and courses based on your GPA, IELTS, and funding capability in 60 seconds.',
     iconName: 'FileText',
-    bgImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600'
+    bgImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1200'
   }
 ];
 

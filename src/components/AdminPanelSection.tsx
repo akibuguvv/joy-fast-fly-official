@@ -45,6 +45,7 @@ import {
 } from 'lucide-react';
 import { Inquiry, NewsPost, CountryInfo, Course } from '../types';
 import { JtecLogo } from './JtecLogo';
+import { COUNTRIES, getMergedCountries } from '../data';
 
 interface AdminPanelProps {
   posts: NewsPost[];
@@ -112,6 +113,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [newsBody, setNewsBody] = useState('');
   const [newsFile, setNewsFile] = useState<File | null>(null);
   const [newsFileUrl, setNewsFileUrl] = useState('');
+  const [newsVideoUrl, setNewsVideoUrl] = useState('');
   const [newsCategory, setNewsCategory] = useState('Student Visa');
   const [newsCountry, setNewsCountry] = useState('Cyprus');
   const [newsStatus, setNewsStatus] = useState<'Published' | 'Draft'>('Published');
@@ -138,14 +140,109 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
-  const [countries, setCountries] = useState<CountryAdminItem[]>([]);
+  const [countries, setCountries] = useState<CountryInfo[]>([]);
   const [visitorsCount, setVisitorsCount] = useState<number>(0);
+  const [links, setLinks] = useState<any[]>([]);
+  const [showAddLinkModal, setShowAddLinkModal] = useState(false);
+  const deleteLink = (id: string) => {
+    const updated = links.filter(l => l.id !== id);
+    setLinks(updated);
+    localStorage.setItem('joyfastfly_links', JSON.stringify(updated));
+  };
+
+  // Country PDF Checklist Management States
+  const [countryPdfs, setCountryPdfs] = useState<Record<string, { pdfName: string; pdfUrl: string; uploadedAt: string }>>(() => {
+    try {
+      const saved = localStorage.getItem('joyfastfly_country_pdfs');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  const [pdfUploadCountryId, setPdfUploadCountryId] = useState(COUNTRIES[0]?.id || '');
+  const [selectedPdfFile, setSelectedPdfFile] = useState<File | null>(null);
+  const [pdfIsDragging, setPdfIsDragging] = useState(false);
+  const [pdfUploadError, setPdfUploadError] = useState('');
+  const [pdfUploading, setPdfUploading] = useState(false);
+
+  const handlePdfUploadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPdfFile || !pdfUploadCountryId) {
+      setPdfUploadError('Please select a country and a PDF checklist file.');
+      return;
+    }
+    if (selectedPdfFile.type !== 'application/pdf' && !selectedPdfFile.name.endsWith('.pdf')) {
+      setPdfUploadError('Only PDF documents are allowed.');
+      return;
+    }
+
+    setPdfUploading(true);
+    setPdfUploadError('');
+
+    try {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target?.result as string;
+        if (base64Url) {
+          const updated = {
+            ...countryPdfs,
+            [pdfUploadCountryId.toLowerCase()]: {
+              pdfName: selectedPdfFile.name,
+              pdfUrl: base64Url,
+              uploadedAt: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+            }
+          };
+          setCountryPdfs(updated);
+          localStorage.setItem('joyfastfly_country_pdfs', JSON.stringify(updated));
+          setSelectedPdfFile(null);
+          alert('Checklist PDF uploaded successfully for ' + COUNTRIES.find(c => c.id === pdfUploadCountryId)?.name + '!');
+        } else {
+          setPdfUploadError('Failed to read PDF file.');
+        }
+        setPdfUploading(false);
+      };
+      reader.onerror = () => {
+        setPdfUploadError('An error occurred while reading the PDF file.');
+        setPdfUploading(false);
+      };
+      reader.readAsDataURL(selectedPdfFile);
+    } catch (err) {
+      console.error(err);
+      setPdfUploadError('Failed to upload PDF checklist.');
+      setPdfUploading(false);
+    }
+  };
+
+  const deleteCountryPdf = (countryId: string) => {
+    const countryName = COUNTRIES.find(c => c.id === countryId)?.name || countryId;
+    requestConfirm(
+      'Delete PDF Checklist',
+      `Are you sure you want to delete the PDF checklist for ${countryName}?`,
+      () => {
+        const updated = { ...countryPdfs };
+        delete updated[countryId.toLowerCase()];
+        setCountryPdfs(updated);
+        localStorage.setItem('joyfastfly_country_pdfs', JSON.stringify(updated));
+        alert(`Deleted PDF checklist for ${countryName}.`);
+      }
+    );
+  };
   
   // Adding/editing states for non-news sections
   const [showAddCountryModal, setShowAddCountryModal] = useState(false);
   const [newCountryName, setNewCountryName] = useState('');
   const [newCountryCode, setNewCountryCode] = useState('');
   const [newCountryStatus, setNewCountryStatus] = useState<'Active' | 'Inactive'>('Active');
+  const [newCountryVisaType, setNewCountryVisaType] = useState<'student' | 'work'>('student');
+  const [newCountryIntake, setNewCountryIntake] = useState('2 - 3 Months');
+  const [newCountryTuition, setNewCountryTuition] = useState('');
+  const [newCountryEducation, setNewCountryEducation] = useState('');
+  const [newCountryIelts, setNewCountryIelts] = useState('No IELTS Required');
+  const [newCountryFunds, setNewCountryFunds] = useState('');
+  const [newCountryHighlights, setNewCountryHighlights] = useState('');
+  const [newCountryCourses, setNewCountryCourses] = useState('');
+  const [newCountryBgImage, setNewCountryBgImage] = useState('');
 
   const [showAddStoryModal, setShowAddStoryModal] = useState(false);
   const [newStoryName, setNewStoryName] = useState('');
@@ -305,7 +402,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
 
   // 4. Fetch Countries
   const fetchCountries = () => {
-    setCountries([]);
+    setCountries(getMergedCountries(true));
   };
 
   const fetchLinks = () => {
@@ -426,19 +523,32 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
 
     const todayStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
+    let determinedFileType: 'image' | 'video' = 'image';
+    let finalMediaUrl = '';
+
+    if (newsFile) {
+      determinedFileType = newsFile.type.startsWith('video') ? 'video' : 'image';
+      finalMediaUrl = URL.createObjectURL(newsFile);
+    } else if (newsVideoUrl) {
+      determinedFileType = 'video';
+      finalMediaUrl = newsVideoUrl;
+    } else if (newsFileUrl) {
+      determinedFileType = 'image';
+      finalMediaUrl = newsFileUrl;
+    } else {
+      determinedFileType = 'image';
+      finalMediaUrl = 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=800';
+    }
+
     if (newsSubView === 'add') {
       // Create new news post
-      const placeholderImg = newsFile 
-        ? URL.createObjectURL(newsFile)
-        : (newsFileUrl || 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=800');
-
       const newPost: NewsPost = {
         id: String(Date.now()),
         title: newsTitle,
         body: newsBody,
-        mediaUrl: placeholderImg,
+        mediaUrl: finalMediaUrl,
         date: newsPublishDate || todayStr,
-        fileType: (newsFile && newsFile.type.startsWith('video')) ? 'video' : 'image',
+        fileType: determinedFileType,
         category: newsCategory,
         isFeatured: isFeatured,
         readTime: readTime || '4 min read',
@@ -452,6 +562,8 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
       // Edit news post
       setPosts(prev => prev.map(post => {
         if (post.id === editingPostId) {
+          // If no new media is specified, retain old values
+          const hasNewMedia = newsFile || newsVideoUrl || newsFileUrl;
           return {
             ...post,
             title: newsTitle,
@@ -461,7 +573,8 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
             isFeatured: isFeatured,
             readTime: readTime,
             highlights: newsShortDescription ? [newsShortDescription] : post.highlights,
-            mediaUrl: newsFile ? URL.createObjectURL(newsFile) : post.mediaUrl
+            fileType: hasNewMedia ? determinedFileType : (post.fileType || 'image'),
+            mediaUrl: hasNewMedia ? finalMediaUrl : post.mediaUrl
           };
         }
         return post;
@@ -483,6 +596,13 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     setIsFeatured(post.isFeatured || false);
     setReadTime(post.readTime || '3 min read');
     setNewsPublishDate(post.date);
+    if (post.fileType === 'video') {
+      setNewsVideoUrl(post.mediaUrl);
+      setNewsFileUrl('');
+    } else {
+      setNewsFileUrl(post.mediaUrl);
+      setNewsVideoUrl('');
+    }
     setNewsSubView('edit');
   };
 
@@ -502,6 +622,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     setNewsBody('');
     setNewsFile(null);
     setNewsFileUrl('');
+    setNewsVideoUrl('');
     setNewsCategory('Student Visa');
     setNewsCountry('Cyprus');
     setNewsStatus('Published');
@@ -622,42 +743,110 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const handleAddCountry = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCountryName || !newCountryCode) return;
-    const newItem: CountryAdminItem = {
-      id: String(Date.now()),
+    
+    const countryId = newCountryName.toLowerCase().trim().replace(/\s+/g, '-');
+    
+    const newCountry: CountryInfo = {
+      id: countryId,
       name: newCountryName,
       code: newCountryCode.toUpperCase(),
-      totalNews: 0,
-      status: newCountryStatus
+      flagUrl: `https://flagcdn.com/w320/${newCountryCode.toLowerCase()}.png`,
+      bgImage: newCountryBgImage || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1200',
+      highlights: newCountryHighlights ? newCountryHighlights.split(',').map(s => s.trim()).filter(Boolean) : ['Added from admin panel'],
+      intakes: [newCountryIntake || '2 - 3 Months'],
+      requirements: {
+        education: newCountryEducation || 'Contact office for details',
+        ielts: newCountryIelts || 'No IELTS Required',
+        funds: newCountryFunds || 'Contact office for details'
+      },
+      popularCourses: newCountryCourses ? newCountryCourses.split(',').map(s => s.trim()).filter(Boolean) : [],
+      tuitionFee: newCountryTuition || 'Contact office for details',
+      visaType: newCountryVisaType,
+      isActive: newCountryStatus === 'Active'
     };
-    const updated = [...countries, newItem];
-    setCountries(updated);
-    localStorage.setItem('joyfastfly_countries_admin', JSON.stringify(updated));
+    
+    const saved = localStorage.getItem('joyfastfly_countries_added');
+    const added: CountryInfo[] = saved ? JSON.parse(saved) : [];
+    
+    const updatedAdded = [...added.filter(c => c.id.toLowerCase() !== countryId), newCountry];
+    localStorage.setItem('joyfastfly_countries_added', JSON.stringify(updatedAdded));
+    
     setNewCountryName('');
     setNewCountryCode('');
+    setNewCountryHighlights('');
+    setNewCountryTuition('');
+    setNewCountryEducation('');
+    setNewCountryIelts('No IELTS Required');
+    setNewCountryFunds('');
+    setNewCountryCourses('');
+    setNewCountryBgImage('');
     setShowAddCountryModal(false);
+    
+    fetchCountries();
   };
 
   const deleteCountry = (id: string) => {
+    const defaultIds = COUNTRIES.map(c => c.id.toLowerCase());
+    if (defaultIds.includes(id.toLowerCase())) {
+      alert('Cannot delete system default countries. You can toggle their active status instead.');
+      return;
+    }
+    
     requestConfirm(
       'Delete Country',
-      'Are you sure you want to delete this country from the directory?',
+      'Are you sure you want to delete this custom added country from the directory?',
       () => {
-        const updated = countries.filter(item => item.id !== id);
-        setCountries(updated);
-        localStorage.setItem('joyfastfly_countries_admin', JSON.stringify(updated));
+        const saved = localStorage.getItem('joyfastfly_countries_added');
+        const added: CountryInfo[] = saved ? JSON.parse(saved) : [];
+        const updated = added.filter(item => item.id.toLowerCase() !== id.toLowerCase());
+        localStorage.setItem('joyfastfly_countries_added', JSON.stringify(updated));
+        
+        const overridesSaved = localStorage.getItem('joyfastfly_countries_status_override');
+        if (overridesSaved) {
+          try {
+            const overrides = JSON.parse(overridesSaved);
+            delete overrides[id.toLowerCase()];
+            localStorage.setItem('joyfastfly_countries_status_override', JSON.stringify(overrides));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        
+        fetchCountries();
       }
     );
   };
 
   const toggleCountryStatus = (id: string) => {
-    const updated = countries.map(item => {
-      if (item.id === id) {
-        return { ...item, status: item.status === 'Active' ? 'Inactive' : 'Active' as const };
+    const countryId = id.toLowerCase();
+    const overridesSaved = localStorage.getItem('joyfastfly_countries_status_override');
+    const overrides: Record<string, boolean> = overridesSaved ? JSON.parse(overridesSaved) : {};
+    
+    const currentList = getMergedCountries(true);
+    const country = currentList.find(c => c.id.toLowerCase() === countryId);
+    if (!country) return;
+    
+    const newActiveState = !(country.isActive !== false);
+    overrides[countryId] = newActiveState;
+    localStorage.setItem('joyfastfly_countries_status_override', JSON.stringify(overrides));
+    
+    const saved = localStorage.getItem('joyfastfly_countries_added');
+    if (saved) {
+      try {
+        const added: CountryInfo[] = JSON.parse(saved);
+        const updatedAdded = added.map(c => {
+          if (c.id.toLowerCase() === countryId) {
+            return { ...c, isActive: newActiveState };
+          }
+          return c;
+        });
+        localStorage.setItem('joyfastfly_countries_added', JSON.stringify(updatedAdded));
+      } catch (e) {
+        console.error(e);
       }
-      return item;
-    });
-    setCountries(updated);
-    localStorage.setItem('joyfastfly_countries_admin', JSON.stringify(updated));
+    }
+    
+    fetchCountries();
   };
 
   // Story actions
@@ -777,9 +966,11 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'news', label: 'News & Updates', icon: FileText },
+    { id: 'countries', label: 'Countries Directory', icon: Globe },
     { id: 'stories', label: 'Success Stories', icon: Award },
     { id: 'applications', label: 'Applications', icon: FileSpreadsheet },
     { id: 'inquiries', label: 'Inquiries', icon: Inbox },
+    { id: 'pdfs', label: 'Country PDFs', icon: Upload },
   ];
 
   return (
@@ -1813,6 +2004,21 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                           />
                         </div>
 
+                        {/* Video URL fallback */}
+                        <div className="flex flex-col gap-1 text-left">
+                          <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">Or Video URL (YouTube, Vimeo, MP4, etc.)</label>
+                          <input 
+                            type="text" 
+                            placeholder="e.g. https://www.youtube.com/watch?v=... or direct MP4 link"
+                            value={newsVideoUrl}
+                            onChange={(e) => setNewsVideoUrl(e.target.value)}
+                            className="border border-gray-200 rounded-xl px-4 py-3 bg-white text-sm font-semibold focus:border-[#da1e28] focus:outline-hidden"
+                          />
+                          <p className="text-[10px] text-gray-400 font-medium">
+                            If you paste a YouTube/Vimeo link or direct video URL, the news post will automatically be configured as a Video post.
+                          </p>
+                        </div>
+
                         {/* Rich text body editor area */}
                         <div className="flex flex-col gap-1 text-left">
                           <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">Content</label>
@@ -2287,143 +2493,11 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
                           </div>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <button 
-                            onClick={() => setShowSqlGuide(!showSqlGuide)}
-                            className="bg-blue-50 text-blue-950 border border-blue-200/50 hover:bg-blue-100 font-extrabold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
-                          >
-                            <Database size={14} />
-                            {showSqlGuide ? 'Hide SQL Code' : 'Show SQL Code'}
-                          </button>
-                          <button 
-                            onClick={handleClearAllInquiries}
-                            className="bg-red-50 text-red-600 border border-red-200/50 hover:bg-red-100 font-extrabold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
-                          >
-                            <Trash2 size={14} />
-                            Delete All Inquiries
-                          </button>
                           <span className="bg-blue-950 text-white text-xs font-black uppercase tracking-widest px-4.5 py-2.5 rounded-xl w-fit select-none shadow-sm">
                             {inquiries.length} Registered Entries
                           </span>
                         </div>
                       </div>
-
-                      {/* Collapsible Supabase SQL Setup Guide */}
-                      {showSqlGuide && (
-                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-white font-sans animate-fade-in shadow-xl relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                          
-                          <div className="flex items-center gap-3 border-b border-slate-800 pb-4 mb-4">
-                            <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center">
-                              <Database size={20} />
-                            </div>
-                            <div>
-                              <h3 className="font-extrabold text-base text-emerald-400">Supabase Database Integration Setup</h3>
-                              <p className="text-xs text-slate-400 font-semibold mt-0.5">Run this SQL in your Supabase SQL Editor to link and sync registrations perfectly</p>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col gap-3">
-                            <div className="flex justify-between items-center bg-slate-850 px-4 py-2 rounded-xl border border-slate-800/80">
-                              <span className="text-xs font-bold text-slate-300">TableName: <code className="bg-slate-800 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-extrabold">inquiries</code></span>
-                              <span className="text-[10px] uppercase font-black tracking-wider text-emerald-400">Recommended Schema</span>
-                            </div>
-
-                            <div className="relative">
-                              <pre className="bg-slate-950 p-4.5 rounded-2xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-[350px] leading-relaxed custom-scrollbar">
-{`-- 1. Create Inquiries Table
-CREATE TABLE IF NOT EXISTS inquiries (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT,
-  phone TEXT NOT NULL,
-  destination TEXT,
-  course TEXT,
-  "ieltsScore" TEXT,
-  "lastGpa" TEXT,
-  message TEXT,
-  status TEXT DEFAULT 'Pending',
-  date TEXT,
-  "visaType" TEXT,
-  "passportNumber" TEXT,
-  "educationLevel" TEXT,
-  "presentDistrict" TEXT,
-  "skillsExperience" TEXT,
-  files TEXT[] DEFAULT '{}'::TEXT[]
-);
-
--- 2. Enable Row Level Security (RLS)
-ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
-
--- 3. Create Open Access Policies for simple sync
-CREATE POLICY "Allow all anonymous actions" 
-ON inquiries 
-FOR ALL 
-USING (true) 
-WITH CHECK (true);
-
--- 4. Delete Single Entry by ID (Replace with target Registration ID)
--- (You can also copy this dynamically for any row by clicking the Database icon below!)
-DELETE FROM inquiries WHERE id = 'JFF-REG-1720894567';
-
--- 5. Delete ALL entries
-DELETE FROM inquiries;`}
-                              </pre>
-                              <button 
-                                onClick={() => {
-                                  navigator.clipboard.writeText(`-- 1. Create Inquiries Table
-CREATE TABLE IF NOT EXISTS inquiries (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT,
-  phone TEXT NOT NULL,
-  destination TEXT,
-  course TEXT,
-  "ieltsScore" TEXT,
-  "lastGpa" TEXT,
-  message TEXT,
-  status TEXT DEFAULT 'Pending',
-  date TEXT,
-  "visaType" TEXT,
-  "passportNumber" TEXT,
-  "educationLevel" TEXT,
-  "presentDistrict" TEXT,
-  "skillsExperience" TEXT,
-  files TEXT[] DEFAULT '{}'::TEXT[]
-);
-
--- 2. Enable Row Level Security (RLS)
-ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
-
--- 3. Create Open Access Policies for simple sync
-CREATE POLICY "Allow all anonymous actions" 
-ON inquiries 
-FOR ALL 
-USING (true) 
-WITH CHECK (true);
-
--- 4. Delete Single Entry by ID (Replace with target Registration ID)
-DELETE FROM inquiries WHERE id = 'YOUR_ID_HERE';
-
--- 5. Delete ALL entries
-DELETE FROM inquiries;`);
-                                  alert('SQL copied to clipboard!');
-                                }}
-                                className="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white px-3 py-1.5 rounded-lg border border-slate-700/50 transition-colors shadow-xs cursor-pointer"
-                              >
-                                Copy Code
-                              </button>
-                            </div>
-                            
-                            <div className="bg-blue-950/20 border border-blue-900/30 rounded-2xl p-4 flex gap-3 text-xs text-slate-300 leading-relaxed mt-2">
-                              <AlertCircle size={18} className="text-blue-400 shrink-0 mt-0.5" />
-                              <div>
-                                <span className="font-extrabold text-blue-300 block mb-1">Casing Compatibility Note:</span>
-                                The columns map matching types exactly so that no user data will be lost during registration. If Supabase keys are modified, the offline local merge acts as a dual-redundancy store so that registration is 100% failproof and persistent!
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
 
                       {/* SEARCH & FILTERS BAR */}
                       <div className="bg-white p-4 rounded-2xl border border-gray-150 shadow-xs flex flex-col md:flex-row items-center gap-4">
@@ -2530,17 +2604,6 @@ DELETE FROM inquiries;`);
                                     </td>
                                     <td className="px-5 py-4.5 text-right">
                                       <div className="flex justify-end gap-2">
-                                        <button 
-                                          onClick={() => {
-                                            const sql = `DELETE FROM inquiries WHERE id = '${item.id}';`;
-                                            navigator.clipboard.writeText(sql);
-                                            alert(`SQL Copied to Clipboard:\n\n${sql}\n\nYou can run this in your Supabase SQL Editor to delete this entry!`);
-                                          }}
-                                          className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                                          title="Copy SQL to delete this entry"
-                                        >
-                                          <Database size={16} />
-                                        </button>
                                         <button 
                                           onClick={() => { setViewingAppId(item.id); setAppSubView('details'); }}
                                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -2772,19 +2835,6 @@ DELETE FROM inquiries;`);
                                 <Trash2 size={16} className="text-red-500 group-hover:text-red-600" />
                                 <span className="text-xs font-bold text-slate-700 group-hover:text-red-600">Delete Entry</span>
                               </button>
-                              <button 
-                                onClick={() => {
-                                  if (viewingAppId) {
-                                    const sql = `DELETE FROM inquiries WHERE id = '${viewingAppId}';`;
-                                    navigator.clipboard.writeText(sql);
-                                    alert(`SQL Copied to Clipboard:\n\n${sql}\n\nYou can run this in your Supabase SQL Editor to delete this entry!`);
-                                  }
-                                }}
-                                className="flex items-center gap-3 px-4 py-2.5 hover:bg-emerald-50 rounded-xl text-left transition-colors border border-transparent hover:border-emerald-200 group w-full cursor-pointer"
-                              >
-                                <Database size={16} className="text-emerald-500 group-hover:text-emerald-600" />
-                                <span className="text-xs font-bold text-slate-700 group-hover:text-emerald-600">Copy SQL Delete Query</span>
-                              </button>
                             </div>
                           </div>
                         </div>
@@ -2878,8 +2928,633 @@ DELETE FROM inquiries;`);
                 </div>
               )}
 
+              {/* TAB: COUNTRIES DIRECTORY */}
+              {activeTab === 'countries' && (
+                <div className="flex flex-col gap-8 animate-fade-in text-left">
+                  
+                  {/* Header and Add Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-blue-950">Countries Directory</h2>
+                      <div className="text-xs font-extrabold text-gray-400 mt-1 uppercase tracking-wider">
+                        Dashboard / Directory / Countries Manager
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowAddCountryModal(true)}
+                      className="bg-[#da1e28] hover:bg-red-700 text-white font-bold text-sm px-6 py-3 rounded-2xl flex items-center gap-2 transition-all shadow-md shadow-red-500/10 cursor-pointer"
+                    >
+                      <Plus size={18} />
+                      <span>Add New Country</span>
+                    </button>
+                  </div>
+
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div className="bg-white border border-gray-150 p-6 rounded-3xl shadow-xs">
+                      <div className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">Total Countries</div>
+                      <div className="text-3xl font-black text-blue-950 mt-1">{countries.length}</div>
+                    </div>
+                    <div className="bg-white border border-gray-150 p-6 rounded-3xl shadow-xs">
+                      <div className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">Study Abroad (Porasuna)</div>
+                      <div className="text-3xl font-black text-red-600 mt-1">
+                        {countries.filter(c => c.visaType !== 'work').length}
+                      </div>
+                    </div>
+                    <div className="bg-white border border-gray-150 p-6 rounded-3xl shadow-xs">
+                      <div className="text-xs font-extrabold text-gray-400 uppercase tracking-wider">Work Permits (Kaj)</div>
+                      <div className="text-3xl font-black text-blue-600 mt-1">
+                        {countries.filter(c => c.visaType === 'work').length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Countries Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {countries.map((country) => {
+                      const isSystemDefault = COUNTRIES.some(c => c.id.toLowerCase() === country.id.toLowerCase());
+                      const isWork = country.visaType === 'work';
+                      
+                      return (
+                        <div key={country.id} className="bg-white border border-gray-150 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col">
+                          
+                          {/* Banner */}
+                          <div className="h-36 relative bg-slate-900 overflow-hidden">
+                            <img 
+                              src={country.bgImage} 
+                              alt={country.name} 
+                              className="w-full h-full object-cover opacity-60"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                            
+                            {/* Absolute top tags */}
+                            <div className="absolute top-4 left-4 flex gap-2">
+                              {isSystemDefault ? (
+                                <span className="bg-slate-800/80 text-white backdrop-blur-xs text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                                  System Default
+                                </span>
+                              ) : (
+                                <span className="bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md">
+                                  Custom Added
+                                </span>
+                              )}
+                              
+                              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                country.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              }`}>
+                                {country.isActive !== false ? 'Active' : 'Inactive'}
+                              </span>
+                            </div>
+
+                            {/* Banner details */}
+                            <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white">
+                              <div className="flex items-center gap-3">
+                                {country.flagUrl && (
+                                  <img 
+                                    src={country.flagUrl} 
+                                    alt={country.name} 
+                                    className="w-9 h-6 object-cover rounded-md border border-white/20 shadow-xs"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                )}
+                                <div>
+                                  <h3 className="font-black text-lg tracking-tight leading-none">{country.name}</h3>
+                                  <span className="text-[10px] text-gray-300 font-bold uppercase">{country.code}</span>
+                                </div>
+                              </div>
+                              
+                              {/* Visa type badge */}
+                              <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1 ${
+                                isWork ? 'bg-blue-600 text-white' : 'bg-[#da1e28] text-white'
+                              }`}>
+                                {isWork ? 'Work Permit' : 'Study Visa'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Content */}
+                          <div className="p-5 flex-grow flex flex-col gap-4 text-xs font-semibold text-slate-600">
+                            <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-100">
+                              <div>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Intake</span>
+                                <div className="font-extrabold text-blue-950 mt-0.5">{country.intakes?.[0] || 'N/A'}</div>
+                              </div>
+                              <div>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cost / Tuition</span>
+                                <div className="font-extrabold text-blue-950 mt-0.5 truncate">{country.tuitionFee || 'N/A'}</div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Key Requirements</span>
+                              <div className="flex flex-col gap-1">
+                                <div className="flex justify-between">
+                                  <span className="text-gray-400 font-bold">Edu:</span>
+                                  <span className="text-blue-950 font-extrabold text-right truncate pl-2">{country.requirements?.education || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-400 font-bold">English:</span>
+                                  <span className="text-blue-950 font-extrabold text-right truncate pl-2">{country.requirements?.ielts || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-400 font-bold">Solvency:</span>
+                                  <span className="text-blue-950 font-extrabold text-right truncate pl-2">{country.requirements?.funds || 'N/A'}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {country.popularCourses && country.popularCourses.length > 0 && (
+                              <div>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+                                  {isWork ? 'Job Fields' : 'Popular Courses'}
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                  {country.popularCourses.map((item, idx) => (
+                                    <span key={idx} className="bg-slate-100 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                      {item}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="p-4 bg-slate-50 border-t border-gray-100 flex items-center justify-between">
+                            <button
+                              onClick={() => toggleCountryStatus(country.id)}
+                              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
+                                country.isActive !== false
+                                  ? 'bg-green-100 hover:bg-green-200 text-green-800'
+                                  : 'bg-red-100 hover:bg-red-200 text-red-800'
+                              }`}
+                            >
+                              <span>{country.isActive !== false ? 'Active' : 'Inactive'}</span>
+                            </button>
+
+                            <button
+                              disabled={isSystemDefault}
+                              onClick={() => deleteCountry(country.id)}
+                              className={`p-2 rounded-xl transition-colors ${
+                                isSystemDefault 
+                                  ? 'text-gray-300 cursor-not-allowed' 
+                                  : 'text-red-500 hover:bg-red-50 hover:text-red-600 cursor-pointer'
+                              }`}
+                              title={isSystemDefault ? 'Cannot delete default system countries' : 'Delete country'}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Empty State */}
+                  {countries.length === 0 && (
+                    <div className="bg-white border border-gray-150 rounded-3xl p-12 text-center max-w-md mx-auto">
+                      <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Globe size={32} />
+                      </div>
+                      <h3 className="text-lg font-black text-blue-950">No Countries Found</h3>
+                      <p className="text-gray-400 font-semibold text-sm mt-1">
+                        There are no countries in your database right now. Add one using the button above.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Add Country Modal */}
+                  {showAddCountryModal && (
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+                      <div className="bg-white rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl border border-gray-100 text-left my-8">
+                        <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-6">
+                          <div>
+                            <h3 className="font-black text-blue-950 text-lg">Add New Country Destination</h3>
+                            <p className="text-xs text-gray-400 font-bold mt-0.5">Define Study or Work permit pathways for candidates</p>
+                          </div>
+                          <button onClick={() => setShowAddCountryModal(false)} className="text-gray-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"><X size={18} /></button>
+                        </div>
+
+                        <form onSubmit={handleAddCountry} className="flex flex-col gap-5">
+                          
+                          {/* Two Column Section */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            
+                            {/* Name */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Country Name</label>
+                              <input 
+                                type="text"
+                                required
+                                value={newCountryName}
+                                onChange={(e) => setNewCountryName(e.target.value)}
+                                placeholder="e.g. Portugal"
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                              />
+                            </div>
+
+                            {/* Code */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Country Code (2 letters)</label>
+                              <input 
+                                type="text"
+                                required
+                                maxLength={2}
+                                value={newCountryCode}
+                                onChange={(e) => setNewCountryCode(e.target.value)}
+                                placeholder="e.g. PT"
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28] uppercase"
+                              />
+                            </div>
+
+                            {/* Visa Category */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Visa Pathway Category</label>
+                              <select 
+                                value={newCountryVisaType}
+                                onChange={(e) => setNewCountryVisaType(e.target.value as any)}
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                              >
+                                <option value="student">Study Abroad (Porasunar Jonno)</option>
+                                <option value="work">Work Permit (Kajer Jonno)</option>
+                              </select>
+                            </div>
+
+                            {/* Status */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Visibility Status</label>
+                              <select 
+                                value={newCountryStatus}
+                                onChange={(e) => setNewCountryStatus(e.target.value as any)}
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                              >
+                                <option value="Active">Active / Visible on Portal</option>
+                                <option value="Inactive">Inactive / Hidden from Portal</option>
+                              </select>
+                            </div>
+
+                            {/* Intake duration */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Processing Timeline / Intake</label>
+                              <input 
+                                type="text"
+                                value={newCountryIntake}
+                                onChange={(e) => setNewCountryIntake(e.target.value)}
+                                placeholder="e.g. 3 - 4 Months"
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                              />
+                            </div>
+
+                            {/* Tuition / processing costs */}
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Tuition Fee / Processing Cost</label>
+                              <input 
+                                type="text"
+                                value={newCountryTuition}
+                                onChange={(e) => setNewCountryTuition(e.target.value)}
+                                placeholder="e.g. €3,000 - 4,500 / year"
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="border-t border-gray-100 pt-4 mt-1">
+                            <h4 className="font-extrabold text-blue-950 text-sm mb-3 uppercase tracking-wider">Pathway Requirements</h4>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Education Requirement</label>
+                                <input 
+                                  type="text"
+                                  value={newCountryEducation}
+                                  onChange={(e) => setNewCountryEducation(e.target.value)}
+                                  placeholder="e.g. Minimum HSC / Alim"
+                                  className="border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">IELTS / English Score</label>
+                                <input 
+                                  type="text"
+                                  value={newCountryIelts}
+                                  onChange={(e) => setNewCountryIelts(e.target.value)}
+                                  placeholder="e.g. No IELTS or MOI"
+                                  className="border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Solvency / Funds Proof</label>
+                                <input 
+                                  type="text"
+                                  value={newCountryFunds}
+                                  onChange={(e) => setNewCountryFunds(e.target.value)}
+                                  placeholder="e.g. Solvency approx. €4,500"
+                                  className="border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Key Highlights (Comma-separated)</label>
+                            <input 
+                              type="text"
+                              value={newCountryHighlights}
+                              onChange={(e) => setNewCountryHighlights(e.target.value)}
+                              placeholder="e.g. Legal employment contract, Schengen travel rights, Low processing cost"
+                              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Popular Courses / Job Fields (Comma-separated)</label>
+                            <input 
+                              type="text"
+                              value={newCountryCourses}
+                              onChange={(e) => setNewCountryCourses(e.target.value)}
+                              placeholder="e.g. Food Packers, Drivers, Hospitality, Software Engineering"
+                              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Background Banner Image URL (Optional)</label>
+                            <input 
+                              type="text"
+                              value={newCountryBgImage}
+                              onChange={(e) => setNewCountryBgImage(e.target.value)}
+                              placeholder="e.g. https://images.unsplash.com/photo-..."
+                              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-hidden focus:border-[#da1e28]"
+                            />
+                          </div>
+
+                          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-2">
+                            <button type="button" onClick={() => setShowAddCountryModal(false)} className="px-5 py-2.5 text-sm font-black text-gray-500 border border-gray-200 rounded-xl hover:bg-slate-50 cursor-pointer">Cancel</button>
+                            <button type="submit" className="px-6 py-2.5 bg-[#da1e28] text-white text-sm font-black rounded-xl hover:bg-red-700 cursor-pointer">Save Country</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB: COUNTRY CHECKLISTS (PDF MANAGER) */}
+              {activeTab === 'pdfs' && (
+                <div className="flex flex-col gap-8 animate-fade-in text-left">
+                  
+                  {/* Header and counter */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-blue-950">Country PDF Checklists</h2>
+                      <div className="text-xs font-extrabold text-gray-400 mt-1 uppercase tracking-wider">
+                        Dashboard / Country Checklists / Upload Manager
+                      </div>
+                    </div>
+                    <span className="bg-blue-950 text-white text-xs font-black uppercase tracking-widest px-4.5 py-2.5 rounded-xl w-fit select-none shadow-sm">
+                      {Object.keys(countryPdfs).length} Uploaded Checklists
+                    </span>
+                  </div>
+
+                  {/* TWO COLUMN GRID */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    {/* Left Column: Upload Form (5 cols) */}
+                    <div className="lg:col-span-5 flex flex-col gap-6">
+                      <div className="bg-white border border-gray-150 rounded-3xl p-6 md:p-8 shadow-xs">
+                        <h3 className="font-black text-blue-950 text-base mb-5 border-b border-gray-100 pb-3">Upload New Checklist</h3>
+                        
+                        <form onSubmit={handlePdfUploadSubmit} className="flex flex-col gap-5">
+                          
+                          {/* Country Selection */}
+                          <div className="flex flex-col gap-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Target Country</label>
+                            <select
+                              value={pdfUploadCountryId}
+                              onChange={(e) => setPdfUploadCountryId(e.target.value)}
+                              className="border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-hidden focus:border-blue-900 focus:ring-1 focus:ring-blue-900 bg-slate-50 cursor-pointer w-full"
+                            >
+                              {COUNTRIES.map((country) => (
+                                <option key={country.id} value={country.id}>
+                                  {country.name} ({country.visaType === 'work' ? 'Work Permit' : 'Student Visa'})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Drag and Drop Zone */}
+                          <div className="flex flex-col gap-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-wider">PDF File</label>
+                            
+                            <div
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setPdfIsDragging(true);
+                              }}
+                              onDragLeave={() => setPdfIsDragging(false)}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setPdfIsDragging(false);
+                                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                                  const file = e.dataTransfer.files[0];
+                                  if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                                    setSelectedPdfFile(file);
+                                    setPdfUploadError('');
+                                  } else {
+                                    setPdfUploadError('Only PDF files are supported.');
+                                  }
+                                }
+                              }}
+                              onClick={() => {
+                                const el = document.getElementById('country-pdf-file-picker');
+                                if (el) el.click();
+                              }}
+                              className={`border-2 border-dashed rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
+                                pdfIsDragging 
+                                  ? 'border-[#da1e28] bg-red-50/20' 
+                                  : selectedPdfFile 
+                                    ? 'border-emerald-300 bg-emerald-50/10' 
+                                    : 'border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-slate-100/50'
+                              }`}
+                            >
+                              <input 
+                                type="file"
+                                id="country-pdf-file-picker"
+                                accept="application/pdf"
+                                className="hidden"
+                                onChange={(e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    setSelectedPdfFile(e.target.files[0]);
+                                    setPdfUploadError('');
+                                  }
+                                }}
+                              />
+                              
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                selectedPdfFile ? 'bg-emerald-100 text-emerald-600' : 'bg-red-50 text-[#da1e28]'
+                              }`}>
+                                <Upload size={20} />
+                              </div>
+
+                              <div className="leading-snug">
+                                {selectedPdfFile ? (
+                                  <div className="flex flex-col gap-1 items-center">
+                                    <span className="text-xs font-black text-slate-800 line-clamp-1">{selectedPdfFile.name}</span>
+                                    <span className="text-[10px] text-emerald-600 font-extrabold uppercase">
+                                      {(selectedPdfFile.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col gap-1">
+                                    <span className="text-xs font-black text-slate-800">Drag & drop your PDF file here</span>
+                                    <span className="text-[10px] text-gray-400 font-bold">or click to browse local files</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Error Message */}
+                          {pdfUploadError && (
+                            <div className="p-3 bg-red-50 border border-red-200/50 rounded-xl flex items-center gap-2 text-red-600 text-xs font-bold">
+                              <AlertCircle size={14} className="shrink-0" />
+                              <span>{pdfUploadError}</span>
+                            </div>
+                          )}
+
+                          {/* Buttons */}
+                          <div className="flex items-center gap-3 pt-4 border-t border-gray-100 justify-end">
+                            {selectedPdfFile && (
+                              <button
+                                type="button"
+                                onClick={() => setSelectedPdfFile(null)}
+                                className="px-5 py-2.5 text-xs font-black text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer"
+                              >
+                                Clear
+                              </button>
+                            )}
+                            <button
+                              type="submit"
+                              disabled={pdfUploading}
+                              className="px-6 py-2.5 bg-[#da1e28] hover:bg-red-700 disabled:bg-red-400 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md shadow-red-600/10 cursor-pointer flex items-center gap-2"
+                            >
+                              {pdfUploading ? (
+                                <>
+                                  <RefreshCw size={12} className="animate-spin" />
+                                  <span>Uploading...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle size={12} />
+                                  <span>Save Checklist</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                        </form>
+
+                      </div>
+                    </div>
+
+                    {/* Right Column: Checklists List (7 cols) */}
+                    <div className="lg:col-span-7 flex flex-col gap-6">
+                      <div className="bg-white border border-gray-150 rounded-3xl p-6 md:p-8 shadow-xs">
+                        <h3 className="font-black text-blue-950 text-base mb-5 border-b border-gray-100 pb-3">Active Document Checklists</h3>
+                        
+                        <div className="flex flex-col gap-4">
+                          {COUNTRIES.map((country) => {
+                            const pdfItem = countryPdfs[country.id.toLowerCase()];
+                            return (
+                              <div key={country.id} className="flex flex-col sm:flex-row items-center sm:justify-between p-4 bg-slate-50 border border-slate-150/60 rounded-2xl gap-4">
+                                
+                                {/* Flag & Country */}
+                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                  <div className="w-12 h-8 rounded-sm overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                                    <img 
+                                      src={country.flagUrl} 
+                                      alt="" 
+                                      className="w-full h-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  </div>
+                                  <div className="text-left leading-tight">
+                                    <div className="font-black text-slate-900 text-sm">{country.name}</div>
+                                    <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                                      {country.visaType === 'work' ? 'Work Permit' : 'Student Visa'}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* PDF Status / Filename */}
+                                <div className="flex-1 text-left sm:text-right px-2">
+                                  {pdfItem ? (
+                                    <div className="flex flex-col leading-tight sm:items-end">
+                                      <span className="text-xs font-black text-blue-950 line-clamp-1" title={pdfItem.pdfName}>
+                                        {pdfItem.pdfName}
+                                      </span>
+                                      <span className="text-[9px] text-gray-400 font-bold mt-1">
+                                        Uploaded: {pdfItem.uploadedAt}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-slate-200/60 text-slate-600">
+                                      Fallback Active (Text Checklist)
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-200">
+                                  {pdfItem ? (
+                                    <>
+                                      <a
+                                        href={pdfItem.pdfUrl}
+                                        download={pdfItem.pdfName}
+                                        className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                                        title="Download and test PDF checklist file"
+                                      >
+                                        <Eye size={15} />
+                                      </a>
+                                      <button
+                                        onClick={() => deleteCountryPdf(country.id)}
+                                        className="p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all cursor-pointer flex items-center justify-center"
+                                        title="Delete PDF checklist"
+                                      >
+                                        <Trash2 size={15} />
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setPdfUploadCountryId(country.id);
+                                        const picker = document.getElementById('country-pdf-file-picker');
+                                        if (picker) picker.click();
+                                      }}
+                                      className="text-xs font-black text-[#da1e28] hover:underline px-2.5 py-1"
+                                    >
+                                      + Upload PDF
+                                    </button>
+                                  )}
+                                </div>
+
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              )}
+
               {/* TABS 9 to 14 FALLBACK PLATFORM INTERFACES */}
-              {!['dashboard', 'news', 'stories', 'applications', 'inquiries'].includes(activeTab) && (
+              {!['dashboard', 'news', 'stories', 'applications', 'inquiries', 'pdfs'].includes(activeTab) && (
                 <div className="bg-white border border-gray-150 rounded-3xl p-10 shadow-xs text-center flex flex-col items-center justify-center gap-4 animate-fade-in min-h-[350px]">
                   <div className="w-14 h-14 bg-blue-50 text-blue-950 rounded-full flex items-center justify-center">
                     <SettingsIcon size={26} />

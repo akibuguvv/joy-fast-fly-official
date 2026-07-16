@@ -158,14 +158,19 @@ export const AboutSection: React.FC = () => {
                   <span className="w-6 h-6 rounded-lg bg-green-500/20 flex items-center justify-center font-black text-green-400 text-[10px]">WA</span>
                   <span>+45 31 87 51 25</span>
                 </a>
-                <a href="mailto:joyabdun@gmail.com" className="flex items-center gap-2 hover:text-red-400 transition-colors">
+                <a href="mailto:joyfastfly@gmail.com" className="flex items-center gap-2 hover:text-red-400 transition-colors">
                   <span className="w-6 h-6 rounded-lg bg-blue-500/20 flex items-center justify-center font-black text-blue-400 text-[10px]">EM</span>
-                  <span>joyabdun@gmail.com</span>
+                  <span>joyfastfly@gmail.com</span>
                 </a>
-                <span className="flex items-center gap-2 text-gray-400">
-                  <span className="w-6 h-6 rounded-lg bg-gray-500/20 flex items-center justify-center font-black text-gray-300 text-[10px]">HL</span>
-                  <span>Hotline: 01766-852120</span>
-                </span>
+                <div className="flex flex-col gap-2 text-gray-400">
+                  <span className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-gray-500/20 flex items-center justify-center font-black text-gray-300 text-[10px]">HL</span>
+                    <span>01746-983358 (মোহাম্মদ আতিক মোল্লা)</span>
+                  </span>
+                  <span className="flex items-center gap-2 ml-8">
+                    <span>01944-554355 (এবিএম মশিউর রহমান)</span>
+                  </span>
+                </div>
               </div>
             </div>
 

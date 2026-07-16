@@ -5,7 +5,7 @@ export const INITIAL_NEWS_POSTS: NewsPost[] = [
     id: '1',
     title: 'Romania Student Visa 2026 Applications Now Open',
     body: 'The Romanian Ministry of Education has officially opened applications for international students for the 2026 intake. Apply now and secure your seat in top universities. Eligible students are encouraged to apply as early as possible to secure admission in top universities. Romania offers great educational opportunities, a rich cultural heritage, and standard living experiences in the European Union.',
-    mediaUrl: 'https://images.unsplash.com/photo-1543831809-1e355c4d1565?q=80&w=1200',
+    mediaUrl: 'https://images.unsplash.com/photo-1568291843233-64e0023a8542?q=80&w=1200',
     date: '13 July 2026',
     fileType: 'image',
     category: 'Student Visa',

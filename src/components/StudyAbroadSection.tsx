@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { COUNTRIES } from '../data';
+import { getMergedCountries } from '../data';
 import { CheckCircle2, GraduationCap, Calendar, Clock, DollarSign, FileText } from 'lucide-react';
 
 interface StudyAbroadSectionProps {
@@ -13,7 +13,8 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
   setSelectedCountryId,
   setSection
 }) => {
-  const [localSelectedCountry, setLocalSelectedCountry] = useState(COUNTRIES[0].id);
+  const countriesList = getMergedCountries();
+  const [localSelectedCountry, setLocalSelectedCountry] = useState(countriesList[0]?.id || 'cyprus');
 
   const activeId = selectedCountryId || localSelectedCountry;
   const setActiveId = (id: string) => {
@@ -23,14 +24,14 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
     setLocalSelectedCountry(id);
   };
 
-  const activeCountry = COUNTRIES.find(c => c.id === activeId) || COUNTRIES[0];
+  const activeCountry = countriesList.find(c => c.id === activeId) || countriesList[0] || { id: 'cyprus', name: 'Cyprus', code: 'CY', flagUrl: '', bgImage: '', highlights: [], intakes: [], requirements: { education: '', ielts: '', funds: '' }, popularCourses: [], tuitionFee: '', visaType: 'student' };
   const isWorkVisa = activeCountry.visaType === 'work';
 
   return (
     <div className="flex flex-col w-full bg-white" id="study-abroad-section">
       {/* Page Header */}
       <section className="bg-blue-950 text-white py-16 px-4 text-center relative overflow-hidden" id="study-banner">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600')] bg-cover bg-center opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600')] bg-cover bg-center opacity-40"></div>
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center gap-2">
           <span className="text-[#da1e28] text-xs font-black uppercase tracking-widest bg-red-500/10 px-3.5 py-1 rounded-full">
             OUR COMPREHENSIVE ROADMAP
@@ -53,11 +54,11 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
             <div className="flex flex-col gap-2">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest text-left pl-2">Study Abroad Destinations</span>
               <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-none" id="sidebar-student-tabs">
-                {COUNTRIES.filter(c => c.visaType !== 'work').map((country) => (
+                {countriesList.filter(c => c.visaType !== 'work').map((country) => (
                   <button
                     key={country.id}
                     onClick={() => setActiveId(country.id)}
-                    className={`px-5 py-3.5 rounded-xl flex items-center justify-between text-left transition-all shrink-0 font-extrabold text-sm border ${
+                    className={`px-5 py-3.5 rounded-full flex items-center justify-between text-left transition-all shrink-0 font-extrabold text-sm border ${
                       activeId === country.id
                         ? 'bg-[#da1e28] border-[#da1e28] text-white shadow-md shadow-red-500/20'
                         : 'bg-white border-gray-100 hover:bg-gray-50 text-blue-950'
@@ -86,11 +87,11 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
             <div className="flex flex-col gap-2">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest text-left pl-2">Work Permits (Skilled Worker)</span>
               <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-none" id="sidebar-work-tabs">
-                {COUNTRIES.filter(c => c.visaType === 'work').map((country) => (
+                {countriesList.filter(c => c.visaType === 'work').map((country) => (
                   <button
                     key={country.id}
                     onClick={() => setActiveId(country.id)}
-                    className={`px-5 py-3.5 rounded-xl flex items-center justify-between text-left transition-all shrink-0 font-extrabold text-sm border ${
+                    className={`px-5 py-3.5 rounded-full flex items-center justify-between text-left transition-all shrink-0 font-extrabold text-sm border ${
                       activeId === country.id
                         ? 'bg-blue-950 border-blue-950 text-white shadow-md shadow-blue-500/20'
                         : 'bg-white border-gray-100 hover:bg-gray-50 text-blue-950'
@@ -121,7 +122,13 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
           <div className="lg:w-2/3 flex flex-col gap-8 bg-gray-50/50 border border-gray-100 rounded-3xl p-6 md:p-10 text-left" id="study-abroad-info-panel">
             
             {/* Header section with cover */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-200/60" id="panel-header">
+            <div className="flex flex-col gap-6 pb-6 border-b border-gray-200/60" id="panel-header">
+              <img 
+                src={activeCountry.bgImage} 
+                alt={activeCountry.name} 
+                className="w-full h-48 object-cover rounded-2xl shadow-sm"
+                referrerPolicy="no-referrer"
+              />
               <div className="flex items-center gap-4">
                 <img 
                   src={activeCountry.flagUrl} 
@@ -138,6 +145,7 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
                   </p>
                 </div>
               </div>
+            </div>
               
 
             </div>
@@ -226,7 +234,7 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
                       }
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-red-700 shadow shrink-0"
+                  className="px-10 py-4 bg-[#da1e28] text-white text-xs font-black uppercase tracking-widest rounded-full hover:bg-red-700 shadow-xl shadow-red-500/20 shrink-0 transition-all hover:scale-105 hover:-translate-y-0.5 border-b-4 border-red-900"
                 >
                     Register Now
                 </button>
@@ -261,8 +269,6 @@ export const StudyAbroadSection: React.FC<StudyAbroadSectionProps> = ({
               </div>
 
             </div>
-
-          </div>
 
         </div>
       </section>

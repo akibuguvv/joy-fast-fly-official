@@ -66,7 +66,7 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
           {/* Countries List Row */}
           <div className="flex flex-col gap-2.5 mt-2" id="footer-destinations-wrapper">
             <div className="flex flex-wrap items-center gap-4" id="footer-destinations">
-              {['Cyprus', 'Serbia', 'Romania'].map((country) => (
+              {['Italy', 'Hungary', 'Poland'].map((country) => (
                 <div key={country} className="bg-blue-900/40 border border-blue-800/60 px-3 py-1.5 rounded-md text-xs font-semibold" title={country}>
                   {country}
                 </div>
@@ -90,14 +90,16 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
             <li className="flex items-start gap-2.5" id="footer-phone">
               <Phone size={18} className="text-[#da1e28] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-1">
-                <span>Hotline: <a href="tel:+8801766852120" className="hover:text-red-300 transition-colors font-bold">01766-852120</a></span>
+                <span>Hotline:</span>
+                <a href="tel:+8801746983358" className="hover:text-red-300 transition-colors font-bold">01746-983358 (আতিক)</a>
+                <a href="tel:+8801944554355" className="hover:text-red-300 transition-colors font-bold">01944-554355 (মশিউর)</a>
                 <span className="text-xs text-gray-400">CEO WhatsApp: <a href="https://wa.me/4531875125" target="_blank" rel="noreferrer" className="hover:text-red-300 transition-colors font-extrabold">+45 31 87 51 25</a></span>
               </div>
             </li>
             <li className="flex items-start gap-2.5" id="footer-email">
               <Mail size={18} className="text-[#da1e28] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-1">
-                <span>Email: <a href="mailto:joyabdun@gmail.com" className="hover:text-red-300 transition-colors font-bold">joyabdun@gmail.com</a></span>
+                <span>Email: <a href="mailto:joyfastfly@gmail.com" className="hover:text-red-300 transition-colors font-bold">joyfastfly@gmail.com</a></span>
                 <span className="text-xs text-gray-400">CEO: Md. Azizul Mollah (Denmark Expatriate)</span>
               </div>
             </li>
@@ -123,7 +125,7 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
               "Give Wings to Your Dream"
             </p>
             <div className="mt-3 text-xs bg-blue-950/80 py-2 px-3 rounded-lg border border-blue-800/40 font-bold" id="footer-wing-card-call">
-              Hotline: <span className="text-red-400">01766-852120</span>
+              Hotline: <span className="text-red-400">01746-983358</span>
             </div>
           </div>
         </div>

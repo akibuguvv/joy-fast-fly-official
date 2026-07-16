@@ -395,12 +395,24 @@ export const ContactSection: React.FC = () => {
                     <div className="flex flex-col gap-2 mt-1 w-full">
                       <div className="flex items-center justify-between gap-2 p-2 bg-red-50/40 border border-red-100/50">
                         <div className="flex flex-col">
-                          <span className="text-[8px] text-red-500 font-black uppercase">Dhaka Office</span>
-                          <a href="tel:01766852120" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
-                            01766-852120
+                          <span className="text-[8px] text-red-500 font-black uppercase">মোহাম্মদ আতিক মোল্লা (ডিরেক্টর)</span>
+                          <a href="tel:+8801746983358" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
+                            +880 1746-983358
                           </a>
                         </div>
-                        <a href="tel:01766852120" className="px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
+                        <a href="tel:+8801746983358" className="px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
+                          Call
+                        </a>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 p-2 bg-red-50/40 border border-red-100/50">
+                        <div className="flex flex-col">
+                          <span className="text-[8px] text-red-500 font-black uppercase">এবিএম মশিউর রহমান (ডিরেক্টর)</span>
+                          <a href="tel:01944554355" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
+                            01944-554355
+                          </a>
+                        </div>
+                        <a href="tel:01944554355" className="px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
                           Call
                         </a>
                       </div>
@@ -433,8 +445,8 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span className="text-[9px] text-gray-400 uppercase tracking-wider font-black">OFFICIAL EMAIL</span>
-                    <a href="mailto:joyabdun@gmail.com" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors break-all mt-0.5">
-                      joyabdun@gmail.com
+                    <a href="mailto:joyfastfly@gmail.com" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors break-all mt-0.5">
+                      joyfastfly@gmail.com
                     </a>
                   </div>
                 </li>
@@ -638,7 +650,7 @@ export const ContactSection: React.FC = () => {
                 <div className="border-b border-gray-100 pb-5 mb-6 flex flex-col gap-4">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-none bg-[#da1e28] text-white flex items-center justify-center shrink-0">
-                      <Sparkles size={16} />
+                      <FileText size={16} />
                     </div>
                     <div className="flex flex-col">
                       <h3 className="text-lg font-black text-gray-950 uppercase tracking-wider font-display leading-tight">
@@ -655,27 +667,27 @@ export const ContactSection: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setVisaType('student')}
-                      className={`py-3.5 px-4 text-center border font-black text-xs uppercase tracking-wider transition-all flex flex-col items-center gap-1.5 ${
+                      className={`py-2 px-3 text-center border font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                         visaType === 'student'
                           ? 'bg-[#da1e28] text-white border-[#da1e28] shadow-sm'
                           : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                     >
-                      <GraduationCap size={16} />
-                      <span>Student Admission (স্টুডেন্ট ভিসা)</span>
+                      <GraduationCap size={14} />
+                      <span>Student Admission</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setVisaType('work')}
-                      className={`py-3.5 px-4 text-center border font-black text-xs uppercase tracking-wider transition-all flex flex-col items-center gap-1.5 ${
+                      className={`py-2 px-3 text-center border font-black text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
                         visaType === 'work'
                           ? 'bg-[#031533] text-white border-[#031533] shadow-sm'
                           : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                     >
-                      <Briefcase size={15} />
-                      <span>Skilled Work Permit (ওয়ার্ক পারমিট)</span>
+                      <Briefcase size={14} />
+                      <span>Skilled Work Permit</span>
                     </button>
                   </div>
                 </div>

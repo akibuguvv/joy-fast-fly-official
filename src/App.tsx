@@ -9,7 +9,6 @@ import { Footer } from './components/Footer';
 import { HomeSection } from './components/HomeSection';
 import { AboutSection } from './components/AboutSection';
 import { StudyAbroadSection } from './components/StudyAbroadSection';
-import { CoursesSection } from './components/CoursesSection';
 import { ExploreCountrySection } from './components/ExploreCountrySection';
 import { SchengenSection } from './components/SchengenSection';
 import { GallerySection } from './components/GallerySection';
@@ -24,8 +23,23 @@ export default function App() {
   const [selectedCountryId, setSelectedCountryId] = useState<string | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(null);
   const [newsCategory, setNewsCategory] = useState<string | null>(null);
-  const [sharedPosts, setSharedPosts] = useState<NewsPost[]>(INITIAL_NEWS_POSTS);
+  const [sharedPosts, setSharedPosts] = useState<NewsPost[]>(() => {
+    const savedNews = localStorage.getItem('joyfastfly_news');
+    if (savedNews) {
+      try {
+        return JSON.parse(savedNews);
+      } catch (e) {
+        console.error('Failed to parse saved news from localStorage', e);
+      }
+    }
+    return INITIAL_NEWS_POSTS;
+  });
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
+
+  // Save news posts to localStorage whenever they change
+  React.useEffect(() => {
+    localStorage.setItem('joyfastfly_news', JSON.stringify(sharedPosts));
+  }, [sharedPosts]);
 
   // Initial URL-to-state (on mount only)
   React.useEffect(() => {
@@ -106,13 +120,6 @@ export default function App() {
             setSection={setSection}
           />
         );
-      case 'courses':
-        return (
-          <CoursesSection 
-            selectedDiscipline={selectedDiscipline} 
-            setSelectedDiscipline={setSelectedDiscipline} 
-          />
-        );
       case 'explore-country':
         return (
           <ExploreCountrySection 
@@ -121,7 +128,7 @@ export default function App() {
           />
         );
       case 'schengen':
-        return <SchengenSection />;
+        return <SchengenSection setSection={setSection} setSelectedCountryId={setSelectedCountryId} />;
       case 'gallery':
         return <GallerySection />;
       case 'contact':

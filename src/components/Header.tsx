@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
     { 
       id: 'study-abroad', 
       label: 'Study Abroad',
-      dropdown: ['Cyprus']
+      dropdown: ['Italy', 'Hungary']
     },
     {
       id: 'news',
@@ -36,12 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
     {
       id: 'work-abroad',
       label: 'Work Permits',
-      dropdown: ['Romania', 'Serbia', 'Bulgaria']
-    },
-    { 
-      id: 'courses', 
-      label: 'Courses',
-      dropdown: ['IT & Engineering', 'Business & Law', 'Medical & Life Sciences']
+      dropdown: ['Poland']
     },
     { id: 'explore-country', label: 'Explore Country' },
     { id: 'schengen', label: 'Schengen Zone' },
@@ -64,6 +59,9 @@ export const Header: React.FC<HeaderProps> = ({
     if (targetSection === 'contact') {
       if (dropdownValue) {
         const countryMap: Record<string, string> = {
+          'Italy': 'italy',
+          'Hungary': 'hungary',
+          'Poland': 'poland',
           'Cyprus': 'cyprus',
           'Romania': 'romania',
           'Serbia': 'serbia'
@@ -104,11 +102,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5 hover:text-red-300 transition-colors">
             <Phone size={12} className="text-[#da1e28]" />
-            <a href="tel:+8801766852120">01766-852120</a>
+            <a href="tel:+8801746983358">01746-983358 (আতিক)</a>, <a href="tel:+8801944554355">01944-554355 (মশিউর)</a>
           </span>
           <span className="flex items-center gap-1.5 hover:text-red-300 transition-colors border-l border-blue-800 pl-4">
             <Mail size={12} className="text-[#da1e28]" />
-            <a href="mailto:joyabdun@gmail.com">joyabdun@gmail.com</a>
+            <a href="mailto:joyfastfly@gmail.com">joyfastfly@gmail.com</a>
           </span>
           <span className="flex items-center gap-1.5 hover:text-red-300 transition-colors border-l border-blue-800 pl-4">
             <span className="text-green-400 font-extrabold uppercase text-[9px] tracking-widest bg-green-950 px-1.5 py-0.5 rounded">CEO WhatsApp</span>
@@ -122,10 +120,10 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Main Navigation Bar */}
-      <nav className="bg-white border-b border-gray-100 shadow-sm" id="primary-navbar">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <nav className="bg-white border-b border-gray-100 shadow-sm relative z-30" id="primary-navbar">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
-          <div className="cursor-pointer" onClick={() => handleNavClick('home')} id="nav-logo-trigger">
+          <div className="cursor-pointer relative z-30" onClick={() => handleNavClick('home')} id="nav-logo-trigger">
             <JtecLogo />
           </div>
 
@@ -260,17 +258,22 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Quick Contact info in Mobile menu */}
             <div className="bg-gray-50 p-6 flex flex-col gap-3 mt-auto" id="mobile-drawer-contacts">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Need Expert Advice?</span>
-              <a href="tel:01766852120" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
-                <Phone size={16} className="text-[#da1e28]" />
-                Hotline: 01766-852120
-              </a>
+              <div className="flex flex-col gap-2">
+                <a href="tel:+8801746983358" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
+                  <Phone size={16} className="text-[#da1e28]" />
+                  <span>01746-983358 (আতিক)</span>
+                </a>
+                <a href="tel:+8801944554355" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28] ml-6">
+                  <span>01944-554355 (মশিউর)</span>
+                </a>
+              </div>
               <a href="https://wa.me/4531875125" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
                 <span className="text-[10px] bg-green-600 text-white px-1.5 py-0.5 rounded font-black">WhatsApp</span>
                 +45 31 87 51 25
               </a>
-              <a href="mailto:joyabdun@gmail.com" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
+              <a href="mailto:joyfastfly@gmail.com" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
                 <Mail size={16} className="text-[#da1e28]" />
-                joyabdun@gmail.com
+                joyfastfly@gmail.com
               </a>
             </div>
           </div>

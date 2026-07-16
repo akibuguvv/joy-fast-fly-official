@@ -35,6 +35,7 @@ export interface CountryInfo {
   popularCourses: string[];
   tuitionFee: string;
   visaType?: 'student' | 'work';
+  isActive?: boolean;
 }
 
 export interface VisaCategory {
