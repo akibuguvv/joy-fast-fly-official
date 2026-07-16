@@ -208,18 +208,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
           {/* 1. Header Banner */}
           <section className="bg-gradient-to-b from-slate-50 to-white pt-20 pb-12 px-4 md:px-8 border-b border-gray-200" id="news-header-banner">
             <div className="max-w-7xl mx-auto flex flex-col gap-6 text-left relative z-10">
-              <div className="flex items-center gap-3">
-                <span className="w-10 h-1 bg-[#da1e28]"></span>
-                <span className="text-[#da1e28] text-xs font-black uppercase tracking-[0.2em] font-mono">
-                  Joy Fast Fly Media
-                </span>
-              </div>
               <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight leading-none uppercase">
                 News & Updates <span className="text-[#da1e28] text-base md:text-2xl font-black font-mono block sm:inline sm:ml-2">(খবর ও নোটিশ)</span>
               </h1>
-              <p className="text-sm md:text-base text-gray-500 max-w-2xl font-medium leading-relaxed">
-                Stay informed with authentic student visa insights, embassy circulars, and real-time immigration guidelines for Schengen and European countries.
-              </p>
 
               {/* Search Bar */}
               <form onSubmit={handleSearchSubmit} className="flex items-center bg-white p-1.5 border-2 border-gray-950 max-w-lg mt-4 shadow-sm">
@@ -574,310 +565,96 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
           </div>
         ) : (
           /* ======================================================================
-             DEFAULT VIEW: DYNAMIC GRID / LIST CONTROLLER (PAGES 1 & 2 OF MOCKUP)
+             DEFAULT VIEW: COMPACT GRID OF NEWS ITEMS (Removed sidebars/featured headers)
              ====================================================================== */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            {/* Left Content Area (8 cols): Featured + Latest Updates / All News List */}
-            <div className="lg:col-span-8 flex flex-col gap-10">
-              
-              {selectedCategory === 'All News' && appliedSearch === '' ? (
-                /* ==========================================
-                   STATE 1: News Home Layout (Featured block)
-                   ========================================== */
-                <div className="flex flex-col gap-10">
-                  
-                  {/* Featured News Widget */}
-                  {featuredPost && (
-                    <div className="flex flex-col gap-5 text-left border-b border-gray-200 pb-10 cursor-pointer group" onClick={() => setSelectedPost(featuredPost)} id={`featured-post-${featuredPost.id}`}>
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 bg-[#da1e28]"></span>
-                        <span className="text-xs font-black uppercase tracking-widest text-[#da1e28] font-mono">Featured Update (विशेष খবর)</span>
-                      </div>
-                      {/* Featured Image */}
-                      <div className="w-full relative overflow-hidden bg-gray-100 mb-2 border border-gray-200 rounded-none">
-                        <img 
-                          src={featuredPost.mediaUrl} 
-                          alt={featuredPost.title} 
-                          className="w-full aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-102" 
-                        />
-                      </div>
-                      
-                      {/* Featured details */}
-                      <div className="flex flex-col gap-3">
-                        <h3 className="text-2xl md:text-4xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-tight uppercase">
-                          {featuredPost.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm md:text-base leading-relaxed line-clamp-3 font-medium">
-                          {featuredPost.body}
-                        </p>
-                        <div className="flex items-center gap-3 mt-1 text-xs font-black text-gray-400 uppercase">
-                          <span className="text-[#da1e28] bg-red-50 border border-red-100 px-2 py-0.5 rounded-none font-black">{featuredPost.category}</span>
-                          <span>&bull;</span>
-                          <span>{featuredPost.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+          <div className="flex flex-col gap-8">
+            {/* Sorting, count and Search result status */}
+            <div className="flex items-center justify-between flex-wrap gap-4 border-b border-gray-100 pb-4">
+              <div className="flex flex-col gap-1 text-left">
+                <h2 className="text-xl font-black text-gray-950 tracking-tight uppercase">
+                  {selectedCategory !== 'All News' ? selectedCategory : 'News & Circulars'}
+                </h2>
+                {appliedSearch && (
+                  <p className="text-xs font-semibold text-gray-400">
+                    Search results for: <span className="text-[#da1e28]">"{appliedSearch}"</span>
+                  </p>
+                )}
+              </div>
 
-                  {/* Latest Updates Grid block */}
-                  <div className="flex flex-col gap-6 text-left">
-                    <div className="flex items-center gap-2 border-b border-gray-200 pb-3">
-                      <h2 className="text-sm font-black text-gray-950 uppercase tracking-widest">
-                        Latest Updates
-                      </h2>
-                    </div>
-
-                    <div className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-none overflow-hidden">
-                      {/* Top Accent Bar like in reference image */}
-                      <div className="h-1.5 w-full bg-[#da1e28]"></div>
-                      
-                      <div className="flex flex-col divide-y divide-gray-100">
-                        {filteredPosts.slice(0, visibleCount).map((post) => (
-                          <div 
-                            key={post.id}
-                            onClick={() => setSelectedPost(post)}
-                            className="flex flex-col sm:flex-row gap-4 p-4 md:p-6 group cursor-pointer hover:bg-slate-50 transition-colors"
-                          >
-                            {/* Left: Compact Thumbnail container */}
-                            <div className="w-full sm:w-48 md:w-56 aspect-[16/10] relative overflow-hidden bg-gray-50 shrink-0 border border-gray-200 rounded-none">
-                              <MediaPreview post={post} iconSize={24} />
-                            </div>
-
-                            {/* Right: Content details (Title + Date w/ Icon) */}
-                            <div className="flex flex-col justify-start flex-grow text-left py-1">
-                              <span className="text-[10px] font-black text-[#da1e28] uppercase tracking-widest font-mono mb-2">
-                                {post.category}
-                              </span>
-                              <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug mb-3">
-                                {post.title}
-                              </h3>
-                              
-                              <div className="flex items-center gap-2 text-sky-600 font-bold">
-                                <Calendar size={16} className="shrink-0" />
-                                <span className="text-xs md:text-sm uppercase tracking-wider font-mono">
-                                  {post.date}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Load More Controller */}
-                    {visibleCount < filteredPosts.length && (
-                      <div className="flex justify-center mt-6">
-                        <button
-                          onClick={() => setVisibleCount(prev => prev + 4)}
-                          className="px-8 py-3.5 bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest rounded-none shadow-md hover:shadow-lg transition-all cursor-pointer"
-                        >
-                          Load More News
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-              ) : (
-                /* ==========================================
-                   STATE 2: News List / Search Results View (Matching Reference Image)
-                   ========================================== */
-                <div className="flex flex-col gap-6 text-left">
-                  
-                  {/* Dynamic Header details */}
-                  <div className="flex items-center justify-between flex-wrap gap-4 border-b border-gray-100 pb-4">
-                    <div className="flex flex-col gap-1">
-                      <h2 className="text-xl font-black text-gray-950 tracking-tight uppercase">
-                        {selectedCategory !== 'All News' ? selectedCategory : 'News & Circulars'}
-                      </h2>
-                      {appliedSearch && (
-                        <p className="text-xs font-semibold text-gray-400">
-                          Search results for: <span className="text-[#da1e28]">"{appliedSearch}"</span>
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Sorting selector */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort:</span>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as 'Latest' | 'Oldest')}
-                        className="border-2 border-gray-950 text-[10px] font-black text-gray-950 rounded-none px-3 py-1.5 bg-white focus:outline-none cursor-pointer"
-                      >
-                        <option value="Latest">LATEST</option>
-                        <option value="Oldest">OLDEST</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* News list items (Matching the layout in the image) */}
-                  {paginatedPosts.length > 0 ? (
-                    <div className="flex flex-col bg-white border border-gray-200 shadow-sm rounded-none overflow-hidden">
-                      {/* Top Accent Bar like in reference image */}
-                      <div className="h-1.5 w-full bg-sky-500"></div>
-                      
-                      <div className="flex flex-col divide-y divide-gray-100">
-                        {paginatedPosts.map((post) => (
-                          <div 
-                            key={post.id}
-                            onClick={() => setSelectedPost(post)}
-                            className="flex flex-col sm:flex-row gap-4 p-4 md:p-6 group cursor-pointer hover:bg-slate-50 transition-colors"
-                          >
-                            {/* Left: Compact Thumbnail container */}
-                            <div className="w-full sm:w-48 md:w-56 aspect-[16/10] relative overflow-hidden bg-gray-50 shrink-0 border border-gray-200 rounded-none">
-                              <MediaPreview post={post} iconSize={24} />
-                            </div>
-
-                            {/* Right: Content details (Title + Date w/ Icon) */}
-                            <div className="flex flex-col justify-start flex-grow text-left py-1">
-                              <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug mb-3">
-                                {post.title}
-                              </h3>
-                              
-                              <div className="flex items-center gap-2 text-sky-600 font-bold">
-                                <Calendar size={16} className="shrink-0" />
-                                <span className="text-xs md:text-sm uppercase tracking-wider font-mono">
-                                  {post.date}
-                                </span>
-                              </div>
-                              
-                              <p className="text-gray-500 text-xs mt-3 line-clamp-2 leading-relaxed font-medium">
-                                {post.body}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-white border border-gray-200 py-16 text-center rounded-none shadow-sm">
-                      <p className="text-gray-950 text-sm font-black uppercase tracking-wider font-mono">
-                        কোনো ফলাফল পাওয়া যায়নি। (No news posts match your filter criteria)
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Standard pagination buttons widget */}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-1.5 mt-8 border-t border-gray-200 pt-6">
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        disabled={currentPage === 1}
-                        className="w-10 h-10 rounded-none bg-white border-2 border-gray-950 text-gray-950 hover:bg-gray-150 flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
-                      >
-                        <ChevronLeft size={16} />
-                      </button>
-                      
-                      {Array.from({ length: totalPages }).map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setCurrentPage(i + 1)}
-                          className={`w-10 h-10 rounded-none text-xs font-black transition-all border-2 cursor-pointer ${
-                            currentPage === i + 1
-                              ? 'bg-[#da1e28] border-[#da1e28] text-white shadow-md shadow-red-600/10'
-                              : 'bg-white border-gray-950 text-gray-950 hover:bg-gray-150'
-                          }`}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                        disabled={currentPage === totalPages}
-                        className="w-10 h-10 rounded-none bg-white border-2 border-gray-950 text-gray-950 hover:bg-gray-150 flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer"
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Sorting selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'Latest' | 'Oldest')}
+                  className="border-2 border-gray-950 text-[10px] font-black text-gray-950 rounded-none px-3 py-1.5 bg-white focus:outline-none cursor-pointer"
+                >
+                  <option value="Latest">LATEST</option>
+                  <option value="Oldest">OLDEST</option>
+                </select>
+              </div>
             </div>
 
-            {/* Right Column (4 cols): Trending Now, Popular Tags, Counselor Assist Call */}
-            <div className="lg:col-span-4 flex flex-col gap-8">
-              
-              {/* Trending Now Sidebar */}
-              <div className="bg-white">
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
-                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
-                    Trending Now
-                  </h3>
-                </div>
+            {filteredPosts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredPosts.slice(0, visibleCount).map((post) => (
+                  <div
+                    key={post.id}
+                    onClick={() => {
+                      if (setSelectedPost) {
+                        setSelectedPost(post);
+                      }
+                    }}
+                    className="flex flex-col bg-white border border-gray-200 group cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5 duration-300 text-left overflow-hidden h-full"
+                  >
+                    {/* Compact Image */}
+                    <div className="w-full h-40 relative overflow-hidden bg-gray-50 border-b border-gray-150 shrink-0">
+                      <MediaPreview post={post} iconSize={20} />
+                    </div>
 
-                <div className="flex flex-col gap-4">
-                  {trendingPosts.map((post, index) => (
-                    <div 
-                      key={post.id || index}
-                      onClick={() => setSelectedPost(post)}
-                      className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
-                    >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative border border-gray-200 rounded-none">
-                        <MediaPreview post={post} iconSize={18} />
-                      </div>
-                      <div className="flex flex-col flex-1 text-left">
-                        <span className="text-[10px] text-[#da1e28] font-black mb-1 uppercase font-mono">{post.category}</span>
-                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
+                    {/* Content Area */}
+                    <div className="flex flex-col p-4 flex-grow justify-between">
+                      <div>
+                        <span className="text-[9px] font-black text-[#da1e28] uppercase tracking-widest font-mono block mb-1">
+                          {post.category}
+                        </span>
+                        <h3 className="text-sm font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug line-clamp-2">
                           {post.title}
-                        </h4>
+                        </h3>
+                        <p className="text-gray-500 text-xs mt-2 line-clamp-2 leading-relaxed font-medium">
+                          {post.body}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 text-sky-600 font-bold mt-4 pt-3 border-t border-gray-50">
+                        <Calendar size={13} className="shrink-0" />
+                        <span className="text-[10px] uppercase tracking-wider font-mono">
+                          {post.date}
+                        </span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-
-              {/* Popular Tags cloud */}
-              <div className="bg-white mt-4">
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
-                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
-                    Popular Tags
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-2 text-left">
-                  {popularTags.map(tag => (
-                    <button
-                      key={tag}
-                      onClick={() => handleTagClick(tag)}
-                      className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-black border border-gray-200 transition-colors rounded-none cursor-pointer"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
+            ) : (
+              <div className="bg-white border border-gray-200 py-16 text-center rounded-none shadow-sm">
+                <p className="text-gray-950 text-sm font-black uppercase tracking-wider font-mono">
+                  কোনো ফলাফল পাওয়া যায়নি। (No news posts match your filter criteria)
+                </p>
               </div>
+            )}
 
-              {/* Counselor Help Profile Card */}
-              <div className="bg-gray-50 border-2 border-gray-950 p-6 flex flex-col gap-4 mt-4">
-                <div className="relative w-full h-44 overflow-hidden bg-gray-200 border border-gray-300 rounded-none">
-                  <img 
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400" 
-                    alt="Joy Fast Fly Expert" 
-                    className="w-full h-full object-cover object-top mix-blend-multiply" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-3 left-3 text-xs font-black text-white uppercase tracking-wider font-mono">
-                    Our Senior Counselor
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2 text-left mt-2">
-                  <h3 className="font-black text-gray-900 text-lg leading-tight">
-                    Need Help with Visa Process?
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                    Our expert team is ready to guide you step-by-step through the process.
-                  </p>
-                </div>
+            {/* Load More Controller */}
+            {visibleCount < filteredPosts.length && (
+              <div className="flex justify-center mt-6">
                 <button
-                  onClick={() => setSection?.('contact')}
-                  className="w-full bg-[#da1e28] hover:bg-red-700 text-white py-3.5 px-4 text-xs font-black uppercase tracking-widest transition-colors mt-2 rounded-none cursor-pointer"
+                  onClick={() => setVisibleCount(prev => prev + 6)}
+                  className="px-8 py-3 bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest rounded-none shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
-                  Contact Now
+                  Load More News
                 </button>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
