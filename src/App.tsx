@@ -36,6 +36,11 @@ export default function App() {
   const [selectedPost, setSelectedPost] = useState<NewsPost | null>(null);
   const [sharedCountries, setSharedCountries] = useState<any[]>([]);
   const [sharedStories, setSharedStories] = useState<any[]>([]);
+  const [siteSettings, setSiteSettings] = useState<any>({
+    logo_url: '/logo.png',
+    favicon_url: '/favicon.ico',
+    hero_banner_url: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000'
+  });
 
   // Fetch data from Supabase on mount
   React.useEffect(() => {
@@ -79,6 +84,15 @@ export default function App() {
         const { data: storyData } = await supabase.from('success_stories').select('*');
         if (storyData && storyData.length > 0) {
           setSharedStories(storyData);
+        }
+
+        // Fetch Site Settings
+        const { data: settingsData } = await supabase.from('site_settings').select('*').eq('id', 'global_assets').single();
+        if (settingsData) {
+          setSiteSettings(prev => ({
+            ...prev,
+            ...settingsData
+          }));
         }
       } catch (e) {
         console.error('Failed to fetch data:', e);
@@ -160,6 +174,7 @@ export default function App() {
             setSelectedCountryId={setSelectedCountryId} 
             posts={sharedPosts}
             setSelectedPost={setSelectedPost}
+            heroBanner={siteSettings.hero_banner_url}
           />
         );
       case 'about':
@@ -202,6 +217,7 @@ export default function App() {
           setSelectedCountryId={setSelectedCountryId}
           setSelectedDiscipline={setSelectedDiscipline}
           setNewsCategory={setNewsCategory}
+          logoUrl={siteSettings.logo_url}
         />
       )}
 

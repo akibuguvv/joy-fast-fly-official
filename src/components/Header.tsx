@@ -8,6 +8,7 @@ interface HeaderProps {
   setSelectedCountryId?: (id: string | null) => void;
   setSelectedDiscipline?: (discipline: string | null) => void;
   setNewsCategory?: (category: string | null) => void;
+  logoUrl?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -15,7 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   setSection,
   setSelectedCountryId,
   setSelectedDiscipline,
-  setNewsCategory
+  setNewsCategory,
+  logoUrl
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -122,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
           <div className="cursor-pointer relative z-30" onClick={() => handleNavClick('home')} id="nav-logo-trigger">
-            <JtecLogo />
+            <JtecLogo logoUrl={logoUrl} />
           </div>
 
           {/* Desktop Menu */}
@@ -194,7 +196,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="w-full bg-white max-h-screen overflow-y-auto flex flex-col shadow-2xl" id="mobile-drawer-content">
             {/* Drawer Header (Crimson color from screenshot 2) */}
             <div className="bg-[#da1e28] px-4 py-4 flex items-center justify-between" id="mobile-drawer-header">
-              <JtecLogo inverted={true} />
+              <JtecLogo inverted={true} logoUrl={logoUrl} />
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 rounded-full text-white hover:bg-white/20 transition-colors"

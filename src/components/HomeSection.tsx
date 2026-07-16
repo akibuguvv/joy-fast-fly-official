@@ -8,9 +8,10 @@ interface HomeSectionProps {
   setSelectedCountryId?: (id: string | null) => void;
   posts: NewsPost[];
   setSelectedPost?: (post: NewsPost | null) => void;
+  heroBanner?: string;
 }
 
-export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelectedCountryId, posts, setSelectedPost }) => {
+export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelectedCountryId, posts, setSelectedPost, heroBanner }) => {
   const countryBadges: string[] = ['CYPRUS', 'ROMANIA', 'SERBIA', 'GREECE'];
 
   const getVisaIcon = (iconName: string) => {
@@ -43,7 +44,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
       >
         {/* Dynamic Background */}
         <div 
-          className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000')] bg-cover bg-center"
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroBanner || 'https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000'})` }}
           id="hero-bg-image"
         ></div>
         <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-950/70 to-blue-950/90 z-0"></div>

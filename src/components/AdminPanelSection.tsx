@@ -102,6 +102,13 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   // Left Sidebar active tab
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Assets State
+  const [logoUrl, setLogoUrl] = useState<string>('/logo.png');
+  const [faviconUrl, setFaviconUrl] = useState<string>('/favicon.ico');
+  const [heroBannerUrl, setHeroBannerUrl] = useState<string>('https://images.unsplash.com/photo-1517976487492-5750f3195933?q=80&w=2000');
 
   // News & Updates Sub-Views ('list' | 'add' | 'edit' | 'details')
   const [newsSubView, setNewsSubView] = useState<'list' | 'add' | 'edit' | 'details'>('list');
@@ -166,6 +173,50 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [pdfUploadError, setPdfUploadError] = useState('');
   const [pdfUploading, setPdfUploading] = useState(false);
 
+  // Fetch Assets
+  const fetchAssets = async () => {
+    if (!supabase) return;
+    try {
+      const { data, error } = await supabase.from('site_settings').select('*').eq('id', 'global_assets').single();
+      if (!error && data) {
+        if (data.logo_url) setLogoUrl(data.logo_url);
+        if (data.favicon_url) setFaviconUrl(data.favicon_url);
+        if (data.hero_banner_url) setHeroBannerUrl(data.hero_banner_url);
+      }
+    } catch (e) {}
+  };
+
+  // Helper: Upload to Supabase Storage
+  const uploadToStorage = async (file: File, bucket: string): Promise<string | null> => {
+    if (!supabase) return null;
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file);
+
+      if (error) {
+        console.error(`Error uploading to ${bucket}:`, error.message);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (e) {
+      console.error('Upload failed:', e);
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handlePdfUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPdfFile || !pdfUploadCountryId) {
@@ -181,32 +232,34 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     setPdfUploadError('');
 
     try {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64Url = event.target?.result as string;
-        if (base64Url) {
-          const updated = {
-            ...countryPdfs,
-            [pdfUploadCountryId.toLowerCase()]: {
-              pdfName: selectedPdfFile.name,
-              pdfUrl: base64Url,
-              uploadedAt: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-            }
-          };
-          setCountryPdfs(updated);
-          localStorage.setItem('joyfastfly_country_pdfs', JSON.stringify(updated));
-          setSelectedPdfFile(null);
-          alert('Checklist PDF uploaded successfully for ' + COUNTRIES.find(c => c.id === pdfUploadCountryId)?.name + '!');
-        } else {
-          setPdfUploadError('Failed to read PDF file.');
+      const uploadedUrl = await uploadToStorage(selectedPdfFile, 'assets');
+      if (uploadedUrl) {
+        const updated = {
+          ...countryPdfs,
+          [pdfUploadCountryId.toLowerCase()]: {
+            pdfName: selectedPdfFile.name,
+            pdfUrl: uploadedUrl,
+            uploadedAt: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          }
+        };
+        setCountryPdfs(updated);
+        localStorage.setItem('joyfastfly_country_pdfs', JSON.stringify(updated));
+        
+        // Save to Supabase DB
+        if (supabase) {
+          await supabase.from('country_checklists').upsert({
+            country_id: pdfUploadCountryId.toLowerCase(),
+            pdf_name: selectedPdfFile.name,
+            pdf_url: uploadedUrl
+          });
         }
-        setPdfUploading(false);
-      };
-      reader.onerror = () => {
-        setPdfUploadError('An error occurred while reading the PDF file.');
-        setPdfUploading(false);
-      };
-      reader.readAsDataURL(selectedPdfFile);
+        
+        setSelectedPdfFile(null);
+        alert('Checklist PDF uploaded successfully to Supabase for ' + COUNTRIES.find(c => c.id === pdfUploadCountryId)?.name + '!');
+      } else {
+        setPdfUploadError('Failed to upload PDF to Supabase Storage.');
+      }
+      setPdfUploading(false);
     } catch (err) {
       console.error(err);
       setPdfUploadError('Failed to upload PDF checklist.');
@@ -259,8 +312,6 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   const [newAppCountry, setNewAppCountry] = useState('Cyprus');
   const [newAppVisaType, setNewAppVisaType] = useState('Student Visa');
   const [newAppStatus, setNewAppStatus] = useState<'New' | 'In Review' | 'Pending' | 'Approved'>('New');
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // State-based Confirmation Modal to avoid browser sandboxing iframe block
   const [confirmModal, setConfirmModal] = useState<{
@@ -462,6 +513,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
       fetchApps();
       fetchCountries();
       fetchLinks();
+      fetchAssets();
     }
   }, [adminUnlocked]);
 
@@ -552,7 +604,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
   };
 
   // Manage News CRUD Actions
-  const handlePostNews = (e: React.FormEvent) => {
+  const handlePostNews = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsTitle || !newsBody) {
       alert('Please fill out Title and Content.');
@@ -566,7 +618,13 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
 
     if (newsFile) {
       determinedFileType = newsFile.type.startsWith('video') ? 'video' : 'image';
-      finalMediaUrl = URL.createObjectURL(newsFile);
+      const uploadedUrl = await uploadToStorage(newsFile, 'news');
+      if (uploadedUrl) {
+        finalMediaUrl = uploadedUrl;
+      } else {
+        alert('File upload failed. Using local preview.');
+        finalMediaUrl = URL.createObjectURL(newsFile);
+      }
     } else if (newsVideoUrl) {
       determinedFileType = 'video';
       finalMediaUrl = newsVideoUrl;
@@ -1098,6 +1156,7 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
     { id: 'applications', label: 'Applications', icon: FileSpreadsheet },
     { id: 'inquiries', label: 'Inquiries', icon: Inbox },
     { id: 'pdfs', label: 'Country PDFs', icon: Upload },
+    { id: 'assets', label: 'Website Assets', icon: Image },
   ];
 
   return (
@@ -1511,6 +1570,12 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
               {/* TAB 2: NEWS & UPDATES (ALL NEWS & ADD NEWS VIEWS) */}
               {activeTab === 'news' && (
                 <div className="flex flex-col gap-6 animate-fade-in text-left">
+                  {isUploading && (
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3 animate-pulse mb-4">
+                      <RefreshCw className="animate-spin text-blue-600" size={20} />
+                      <span className="text-blue-700 font-bold">Uploading media to Supabase Storage...</span>
+                    </div>
+                  )}
                   
                   {/* subview 1: ALL NEWS LIST */}
                   {newsSubView === 'list' && (
@@ -3686,6 +3751,90 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
 
                   </div>
 
+                </div>
+              )}
+
+              {/* TAB: ASSETS VIEW */}
+              {activeTab === 'assets' && (
+                <div className="flex flex-col gap-8 animate-fade-in text-left">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-blue-950">Website Global Assets</h2>
+                      <div className="text-xs font-extrabold text-gray-400 mt-1 uppercase tracking-wider">
+                        Dashboard / Settings / Assets Manager
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Logo Settings */}
+                    <div className="bg-white border border-gray-150 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col gap-6">
+                      <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
+                        <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                          <Image size={20} />
+                        </div>
+                        <h3 className="font-black text-blue-950 text-base">Main Logo</h3>
+                      </div>
+                      
+                      <div className="bg-slate-100 rounded-2xl p-8 flex items-center justify-center min-h-[160px] border border-slate-200">
+                        <img src={logoUrl} alt="Main Logo" className="max-h-24 object-contain" />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Upload New Logo (Permanent)</label>
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await uploadToStorage(file, 'assets');
+                              if (url) {
+                                setLogoUrl(url);
+                                if (supabase) await supabase.from('site_settings').upsert({ id: 'global_assets', logo_url: url });
+                                alert('Logo updated permanently on Supabase Storage!');
+                              }
+                            }
+                          }}
+                          className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Hero Banner Settings */}
+                    <div className="bg-white border border-gray-150 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col gap-6">
+                      <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
+                        <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center">
+                          <Layout size={20} />
+                        </div>
+                        <h3 className="font-black text-blue-950 text-base">Hero Banner</h3>
+                      </div>
+                      
+                      <div className="bg-slate-100 rounded-2xl overflow-hidden aspect-video border border-slate-200">
+                        <img src={heroBannerUrl} alt="Hero Banner" className="w-full h-full object-cover" />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <label className="text-xs font-black text-slate-500 uppercase tracking-wider">Upload New Banner (Permanent)</label>
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const url = await uploadToStorage(file, 'assets');
+                              if (url) {
+                                setHeroBannerUrl(url);
+                                if (supabase) await supabase.from('site_settings').upsert({ id: 'global_assets', hero_banner_url: url });
+                                alert('Hero banner updated permanently on Supabase Storage!');
+                              }
+                            }
+                          }}
+                          className="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
