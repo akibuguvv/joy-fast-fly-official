@@ -60,11 +60,11 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ setSection, setSelecte
             <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
               <div className="flex items-center gap-3">
                 <span className="text-[#ff9800]">📞</span>
-                <span>+880 1746-983358 (মোহাম্মদ আতিক মোল্লা - ডিরেক্টর)</span>
+                <span>+880 1746-983358 (MD ATIKUR RAHMAN MOLLA)</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[#ff9800]">📞</span>
-                <span>01944554355 (এবিএম মশিউর রহমান - ডিরেক্টর)</span>
+                <span>01944554355 (ABM Mashiur Rahman - Director)</span>
               </div>
             </div>
             <div className="flex items-center gap-3 justify-center">

@@ -206,50 +206,55 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
       {!selectedPost && (
         <>
           {/* 1. Header Banner */}
-          <section className="bg-gradient-to-b from-slate-50 to-white pt-20 pb-12 px-4 md:px-8 border-b border-gray-200" id="news-header-banner">
+          <section className="bg-gradient-to-b from-slate-50 via-blue-50/10 to-white pt-24 pb-14 px-4 md:px-8 border-b border-gray-100 relative overflow-hidden" id="news-header-banner">
+            {/* Background decorative patterns */}
+            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
+            
             <div className="max-w-7xl mx-auto flex flex-col gap-6 text-left relative z-10">
-              <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tight leading-none uppercase">
-                News & Updates <span className="text-[#da1e28] text-base md:text-2xl font-black font-mono block sm:inline sm:ml-2">(খবর ও নোটিশ)</span>
-              </h1>
-
-              {/* Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="flex items-center bg-white p-1.5 border-2 border-gray-950 max-w-lg mt-4 shadow-sm">
-                <div className="flex items-center pl-3 pr-2 text-gray-400">
-                  <Search size={18} className="text-gray-950" />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col gap-2">
+                  <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-none uppercase">
+                    News & <span className="text-[#da1e28]">Updates</span>
+                  </h1>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-100 text-[#da1e28] text-xs font-bold rounded-full w-fit">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#da1e28] animate-pulse"></span>
+                    খবর ও নোটিশ
+                  </span>
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Search news & circulars..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-grow bg-transparent text-sm font-black text-gray-900 placeholder-gray-400 focus:outline-none py-2 px-1"
-                />
-                <button 
-                  type="submit"
-                  className="bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider px-6 py-2.5 transition-colors rounded-none cursor-pointer"
-                >
-                  Search
-                </button>
-              </form>
-            </div>
-          </section>
 
-          {/* 2. Horizontal Category Section */}
-          <section className="bg-white border-b border-gray-200 px-4 md:px-8 sticky top-20 z-30 shadow-xs" id="news-category-bar">
-            <div className="max-w-7xl mx-auto flex items-center gap-6 overflow-x-auto no-scrollbar scroll-smooth">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryClick(cat)}
-                  className={`py-4 text-xs font-black tracking-widest uppercase transition-all shrink-0 border-b-2 -mb-[2px] ${
-                    selectedCategory === cat
-                      ? 'border-[#da1e28] text-[#da1e28]'
-                      : 'border-transparent text-gray-600 hover:text-[#da1e28]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+                {/* Modern search bar container */}
+                <div className="w-full md:max-w-md">
+                  <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-white border border-gray-200 focus-within:border-[#da1e28] focus-within:ring-2 focus-within:ring-red-100 rounded-full pl-4 pr-1.5 py-1.5 shadow-sm hover:shadow-md transition-all duration-300">
+                    <Search size={18} className="text-gray-400 shrink-0 mr-2" />
+                    <input 
+                      type="text" 
+                      placeholder="Search news & circulars..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-transparent text-sm font-semibold text-gray-900 placeholder-gray-400 focus:outline-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery('');
+                          setAppliedSearch('');
+                          setCurrentPage(1);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors mr-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                    <button 
+                      type="submit"
+                      className="bg-[#da1e28] hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shrink-0 cursor-pointer"
+                    >
+                      Search
+                    </button>
+                  </form>
+                </div>
+              </div>
             </div>
           </section>
         </>
