@@ -154,6 +154,20 @@ Web: joyfastfly.com`;
           currency: 'Euro (EUR)',
           intakes: 'Jan, May, Sep'
         };
+      case 'south-cyprus':
+        return {
+          subtitle: 'European Union Member',
+          language: 'English / Greek',
+          currency: 'Euro (EUR)',
+          intakes: 'Feb, Sep'
+        };
+      case 'northern-cyprus':
+        return {
+          subtitle: 'European Continent',
+          language: 'English / Turkish',
+          currency: 'Turkish Lira (TRY)',
+          intakes: 'Feb, Sep'
+        };
       case 'greece':
         return {
           subtitle: 'Schengen Zone Member',

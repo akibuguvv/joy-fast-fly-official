@@ -830,11 +830,14 @@ export const ContactSection: React.FC = () => {
                           {visaType === 'student' ? (
                             <>
                               <option value="Cyprus">Cyprus (সাইপ্রাস)</option>
+                              <option value="South Cyprus">South Cyprus (দক্ষিণ সাইপ্রাস)</option>
+                              <option value="Northern Cyprus">Northern Cyprus (উত্তর সাইপ্রাস)</option>
                             </>
                           ) : (
                             <>
                               <option value="Romania">Romania (রোমানিয়া)</option>
                               <option value="Serbia">Serbia (সার্বিয়া)</option>
+                              <option value="Greece">Greece (গ্রিস)</option>
                             </>
                           )}
                         </select>

@@ -24,6 +24,50 @@ export const COUNTRIES: CountryInfo[] = [
     visaType: 'student'
   },
   {
+    id: 'south-cyprus',
+    name: 'South Cyprus',
+    code: 'CY',
+    flagUrl: 'https://flagcdn.com/w320/cy.png',
+    bgImage: 'https://images.unsplash.com/photo-1542178243-336fd044e540?q=80&w=1200',
+    highlights: [
+      'High-quality education with European standards.',
+      'Affordable tuition fees and cost of living.',
+      'Excellent business and tourism management programs.',
+      'Beautiful Mediterranean lifestyle.'
+    ],
+    intakes: ['2 - 3 Months'],
+    requirements: {
+      education: 'Minimum HSC / Alim completed (GPA 2.50+)',
+      ielts: 'No IELTS',
+      funds: 'Bank statement of approx. €4,500 to €6,000'
+    },
+    popularCourses: ['Hospitality Management', 'Business Administration', 'IT & Computing'],
+    tuitionFee: '€3,000 - 6,000 per year',
+    visaType: 'student'
+  },
+  {
+    id: 'northern-cyprus',
+    name: 'Northern Cyprus',
+    code: 'TRNC',
+    flagUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Flag_of_Northern_Cyprus.svg/320px-Flag_of_Northern_Cyprus.svg.png',
+    bgImage: 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=1200',
+    highlights: [
+      'Very affordable tuition fees and living costs.',
+      'Wide range of programs for international students.',
+      'Vibrant student life in Mediterranean environment.',
+      'Simple visa processing for international students.'
+    ],
+    intakes: ['2 - 3 Months'],
+    requirements: {
+      education: 'Minimum HSC / Alim completed (GPA 2.00+)',
+      ielts: 'No IELTS',
+      funds: 'Bank statement of approx. €3,000 to €4,000'
+    },
+    popularCourses: ['Tourism Management', 'Business Administration', 'Engineering'],
+    tuitionFee: '€2,000 - 5,000 per year',
+    visaType: 'student'
+  },
+  {
     id: 'serbia',
     name: 'Serbia',
     code: 'RS',
