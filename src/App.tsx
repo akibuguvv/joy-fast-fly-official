@@ -61,11 +61,28 @@ export default function App() {
           .order('date', { ascending: false });
 
         if (newsData && newsData.length > 0) {
-          setSharedPosts(newsData.map((item: any) => ({
-            ...item,
-            highlights: typeof item.highlights === 'string' ? JSON.parse(item.highlights) : item.highlights,
-            studentDetails: typeof item.studentDetails === 'string' ? JSON.parse(item.studentDetails) : item.studentDetails,
-          })));
+          setSharedPosts(newsData.map((item: any) => {
+            const mappedItem = {
+              id: item.id !== undefined ? String(item.id) : undefined,
+              title: item.title,
+              body: item.body,
+              mediaUrl: item.mediaUrl !== undefined ? item.mediaUrl : (item.media_url !== undefined ? item.media_url : ''),
+              date: item.date,
+              fileType: item.fileType !== undefined ? item.fileType : (item.file_type !== undefined ? item.file_type : 'image'),
+              category: item.category,
+              readTime: item.readTime !== undefined ? item.readTime : (item.read_time !== undefined ? item.read_time : undefined),
+              author: item.author,
+              isFeatured: item.isFeatured !== undefined ? item.isFeatured : (item.is_featured !== undefined ? item.is_featured : undefined),
+              highlights: item.highlights,
+              studentDetails: item.studentDetails !== undefined ? item.studentDetails : (item.student_details !== undefined ? item.student_details : undefined)
+            };
+
+            return {
+              ...mappedItem,
+              highlights: typeof mappedItem.highlights === 'string' ? JSON.parse(mappedItem.highlights) : mappedItem.highlights,
+              studentDetails: typeof mappedItem.studentDetails === 'string' ? JSON.parse(mappedItem.studentDetails) : mappedItem.studentDetails,
+            };
+          }));
         }
 
         // Fetch Countries

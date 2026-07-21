@@ -653,18 +653,94 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
         highlights: newsShortDescription ? [newsShortDescription] : []
       };
 
-      // Save to Supabase if available
+      // Save to Supabase with automatic field matching/pruning logic
       if (supabase) {
-        supabase
-          .from('news')
-          .insert([{
-            ...newPost,
+        try {
+          // Attempt 1: camelCase
+          let insertPayload: any = {
+            id: newPost.id,
+            title: newPost.title,
+            body: newPost.body,
+            mediaUrl: newPost.mediaUrl,
+            date: newPost.date,
+            fileType: newPost.fileType,
+            category: newPost.category,
+            isFeatured: newPost.isFeatured,
+            readTime: newPost.readTime,
+            author: newPost.author,
             highlights: JSON.stringify(newPost.highlights),
             studentDetails: JSON.stringify(newPost.studentDetails || {})
-          }])
-          .then(({ error }) => {
-            if (error) console.error('Error saving news to Supabase:', error);
-          });
+          };
+
+          let insertSuccess = false;
+          let lastError: any = null;
+
+          for (let attempt = 0; attempt < 5; attempt++) {
+            const { error } = await supabase.from('news').insert([insertPayload]);
+            if (!error) {
+              insertSuccess = true;
+              break;
+            }
+            lastError = error;
+            console.error(`[Supabase News Insert] Attempt ${attempt} failed:`, error);
+
+            // Attempt 2: Convert camelCase keys to snake_case mapping
+            if (attempt === 0) {
+              insertPayload = {
+                id: newPost.id,
+                title: newPost.title,
+                body: newPost.body,
+                media_url: newPost.mediaUrl,
+                date: newPost.date,
+                file_type: newPost.fileType,
+                category: newPost.category,
+                is_featured: newPost.isFeatured,
+                read_time: newPost.readTime,
+                author: newPost.author,
+                highlights: JSON.stringify(newPost.highlights),
+                student_details: JSON.stringify(newPost.studentDetails || {})
+              };
+              continue;
+            }
+
+            // Attempt 3-5: Parse error and prune specific invalid columns
+            const detailsStr = `${error.message || ''} ${error.details || ''} ${error.hint || ''}`;
+            let pruned = false;
+
+            for (const key of Object.keys(insertPayload)) {
+              const regex = new RegExp('\\b' + key + '\\b', 'i');
+              if (regex.test(detailsStr)) {
+                delete insertPayload[key];
+                pruned = true;
+                break;
+              }
+            }
+
+            if (pruned) continue;
+            break;
+          }
+
+          if (!insertSuccess) {
+            console.error('[Supabase News Sync Failed]', lastError);
+            const isRls = lastError?.message?.toLowerCase().includes('row-level security') || 
+                          lastError?.message?.toLowerCase().includes('permission') ||
+                          lastError?.code === '42501';
+
+            if (isRls) {
+              alert(
+                `Supabase Permission Error: News saved locally, but online sync failed because Row Level Security (RLS) is blocking inserts on your 'news' table.\n\n` +
+                `How to fix:\n` +
+                `1. Go to your Supabase Dashboard -> Table Editor -> select 'news' table.\n` +
+                `2. Disable Row Level Security (RLS) or add an insert policy for anon/authenticated users.\n\n` +
+                `Details: ${lastError.message}`
+              );
+            } else {
+              alert(`Database Sync Alert: Post saved locally, but online database sync failed.\nReason: ${lastError?.message || 'Schema mismatch error'}`);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to run online insertion:', err);
+        }
       }
 
       setPosts(prev => [newPost, ...prev]);
@@ -683,19 +759,93 @@ export const AdminPanelSection: React.FC<AdminPanelProps> = ({ posts, setPosts, 
         mediaUrl: finalMediaUrl
       };
 
-      // Save to Supabase if available
+      // Save to Supabase with automatic field matching/pruning logic
       if (supabase) {
-        supabase
-          .from('news')
-          .update({
-            ...updatedPostData,
+        try {
+          let updatePayload: any = {
+            title: updatedPostData.title,
+            body: updatedPostData.body,
+            category: updatedPostData.category,
+            date: updatedPostData.date,
+            isFeatured: updatedPostData.isFeatured,
+            readTime: updatedPostData.readTime,
             highlights: JSON.stringify(updatedPostData.highlights),
+            fileType: updatedPostData.fileType,
+            mediaUrl: updatedPostData.mediaUrl,
             studentDetails: JSON.stringify(updatedPostData.studentDetails || {})
-          })
-          .eq('id', editingPostId)
-          .then(({ error }) => {
-            if (error) console.error('Error updating news in Supabase:', error);
-          });
+          };
+
+          let updateSuccess = false;
+          let lastError: any = null;
+
+          for (let attempt = 0; attempt < 5; attempt++) {
+            const { error } = await supabase
+              .from('news')
+              .update(updatePayload)
+              .eq('id', editingPostId);
+
+            if (!error) {
+              updateSuccess = true;
+              break;
+            }
+            lastError = error;
+            console.error(`[Supabase News Update] Attempt ${attempt} failed:`, error);
+
+            // Convert camelCase keys to snake_case mapping on retry
+            if (attempt === 0) {
+              updatePayload = {
+                title: updatedPostData.title,
+                body: updatedPostData.body,
+                category: updatedPostData.category,
+                date: updatedPostData.date,
+                is_featured: updatedPostData.isFeatured,
+                read_time: updatedPostData.readTime,
+                highlights: JSON.stringify(updatedPostData.highlights),
+                file_type: updatedPostData.fileType,
+                media_url: updatedPostData.mediaUrl,
+                student_details: JSON.stringify(updatedPostData.studentDetails || {})
+              };
+              continue;
+            }
+
+            // Parse error and prune specific invalid columns
+            const detailsStr = `${error.message || ''} ${error.details || ''} ${error.hint || ''}`;
+            let pruned = false;
+
+            for (const key of Object.keys(updatePayload)) {
+              const regex = new RegExp('\\b' + key + '\\b', 'i');
+              if (regex.test(detailsStr)) {
+                delete updatePayload[key];
+                pruned = true;
+                break;
+              }
+            }
+
+            if (pruned) continue;
+            break;
+          }
+
+          if (!updateSuccess) {
+            console.error('[Supabase News Update Failed]', lastError);
+            const isRls = lastError?.message?.toLowerCase().includes('row-level security') || 
+                          lastError?.message?.toLowerCase().includes('permission') ||
+                          lastError?.code === '42501';
+
+            if (isRls) {
+              alert(
+                `Supabase Permission Error: Updates saved locally, but online sync failed because Row Level Security (RLS) is blocking edits on your 'news' table.\n\n` +
+                `How to fix:\n` +
+                `1. Go to your Supabase Dashboard.\n` +
+                `2. Add an update policy for anon/authenticated users on the 'news' table.\n\n` +
+                `Details: ${lastError.message}`
+              );
+            } else {
+              alert(`Database Sync Alert: Updates saved locally, but online sync failed.\nReason: ${lastError?.message || 'Schema mismatch error'}`);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to run online update:', err);
+        }
       }
 
       setPosts(prev => prev.map(post => {
