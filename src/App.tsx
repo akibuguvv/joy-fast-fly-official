@@ -77,10 +77,39 @@ export default function App() {
               studentDetails: item.studentDetails !== undefined ? item.studentDetails : (item.student_details !== undefined ? item.student_details : undefined)
             };
 
+            let parsedHighlights: any[] = [];
+            if (mappedItem.highlights) {
+              if (typeof mappedItem.highlights === 'string') {
+                try {
+                  const parsed = JSON.parse(mappedItem.highlights);
+                  parsedHighlights = Array.isArray(parsed) ? parsed : [parsed];
+                } catch (e) {
+                  parsedHighlights = [mappedItem.highlights];
+                }
+              } else if (Array.isArray(mappedItem.highlights)) {
+                parsedHighlights = mappedItem.highlights;
+              } else {
+                parsedHighlights = [String(mappedItem.highlights)];
+              }
+            }
+
+            let parsedStudentDetails: any = undefined;
+            if (mappedItem.studentDetails) {
+              if (typeof mappedItem.studentDetails === 'string') {
+                try {
+                  parsedStudentDetails = JSON.parse(mappedItem.studentDetails);
+                } catch (e) {
+                  parsedStudentDetails = undefined;
+                }
+              } else if (typeof mappedItem.studentDetails === 'object') {
+                parsedStudentDetails = mappedItem.studentDetails;
+              }
+            }
+
             return {
               ...mappedItem,
-              highlights: typeof mappedItem.highlights === 'string' ? JSON.parse(mappedItem.highlights) : mappedItem.highlights,
-              studentDetails: typeof mappedItem.studentDetails === 'string' ? JSON.parse(mappedItem.studentDetails) : mappedItem.studentDetails,
+              highlights: parsedHighlights,
+              studentDetails: parsedStudentDetails,
             };
           }));
         }
@@ -88,13 +117,24 @@ export default function App() {
         // Fetch Countries
         const { data: countryData } = await supabase.from('countries').select('*');
         if (countryData && countryData.length > 0) {
-          setSharedCountries(countryData.map((item: any) => ({
-            ...item,
-            highlights: typeof item.highlights === 'string' ? JSON.parse(item.highlights) : item.highlights,
-            intakes: typeof item.intakes === 'string' ? JSON.parse(item.intakes) : item.intakes,
-            requirements: typeof item.requirements === 'string' ? JSON.parse(item.requirements) : item.requirements,
-            popularCourses: typeof item.popularCourses === 'string' ? JSON.parse(item.popularCourses) : item.popularCourses,
-          })));
+          setSharedCountries(countryData.map((item: any) => {
+            const safeParseJson = (val: any, fallback: any) => {
+              if (val === null || val === undefined) return fallback;
+              if (typeof val === 'object') return val;
+              try {
+                return JSON.parse(val);
+              } catch (e) {
+                return fallback;
+              }
+            };
+            return {
+              ...item,
+              highlights: safeParseJson(item.highlights, []),
+              intakes: safeParseJson(item.intakes, []),
+              requirements: safeParseJson(item.requirements, {}),
+              popularCourses: safeParseJson(item.popularCourses, []),
+            };
+          }));
         }
 
         // Fetch Stories

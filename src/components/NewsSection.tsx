@@ -93,9 +93,34 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
     'Scholarship'
   ], []);
 
+  // Synchronize category prop from App.tsx/Header.tsx selection
+  React.useEffect(() => {
+    if (category) {
+      if (category === 'News') {
+        setSelectedCategory('All News');
+      } else if (categories.includes(category)) {
+        setSelectedCategory(category);
+      } else if (category === 'Videos' || category === 'Pictures') {
+        setSelectedCategory('All News');
+      }
+    } else {
+      setSelectedCategory('All News');
+    }
+    setSearchQuery('');
+    setAppliedSearch('');
+    setCurrentPage(1);
+  }, [category, categories]);
+
   // Filter and Search logic
   const filteredPosts = useMemo(() => {
     let result = [...posts];
+
+    // Filter by fileType if Videos or Pictures are selected under News & Media Menu
+    if (category === 'Videos') {
+      result = result.filter(post => post.fileType === 'video');
+    } else if (category === 'Pictures') {
+      result = result.filter(post => post.fileType === 'image');
+    }
 
     // Category Filter
     if (selectedCategory !== 'All News') {
