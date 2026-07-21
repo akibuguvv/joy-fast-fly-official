@@ -4,22 +4,24 @@ import {
   X, 
   Calendar, 
   ArrowRight, 
-  PlayCircle, 
+  Play, 
   Newspaper, 
   ArrowLeft, 
   Clock, 
   Search, 
-  Share2, 
   Check, 
-  Send,
-  ChevronLeft,
-  ChevronRight,
+  ChevronRight, 
+  Facebook, 
+  Twitter, 
+  Linkedin, 
+  Link2,
+  Sparkles,
+  Award,
+  BookOpen,
+  Globe,
+  Bell,
   TrendingUp,
-  Tag,
-  Facebook,
-  Twitter,
-  Linkedin,
-  MessageCircle
+  Tag
 } from 'lucide-react';
 
 const getYoutubeThumbnail = (url: string): string | null => {
@@ -32,13 +34,18 @@ const getYoutubeThumbnail = (url: string): string | null => {
   return null;
 };
 
-const MediaPreview: React.FC<{ post: NewsPost; className?: string; iconSize?: number }> = ({ post, className = "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105", iconSize = 36 }) => {
+const MediaPreview: React.FC<{ post: NewsPost; className?: string }> = ({ 
+  post, 
+  className = "w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+}) => {
   if (post.fileType === 'image') {
     return (
       <img 
         src={post.mediaUrl} 
         alt={post.title} 
         className={className} 
+        loading="lazy"
+        referrerPolicy="no-referrer"
       />
     );
   } else {
@@ -46,9 +53,11 @@ const MediaPreview: React.FC<{ post: NewsPost; className?: string; iconSize?: nu
     if (ytThumb) {
       return (
         <div className="relative w-full h-full overflow-hidden">
-          <img src={ytThumb} alt={post.title} className={className} />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors duration-300">
-            <PlayCircle size={iconSize} className="text-white drop-shadow-md" />
+          <img src={ytThumb} alt={post.title} className={className} loading="lazy" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors duration-300">
+            <div className="w-12 h-12 bg-[#da1e28] text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 pl-0.5">
+              <Play size={22} fill="currentColor" className="text-white" />
+            </div>
           </div>
         </div>
       );
@@ -56,8 +65,10 @@ const MediaPreview: React.FC<{ post: NewsPost; className?: string; iconSize?: nu
     return (
       <div className="relative w-full h-full overflow-hidden">
         <video src={post.mediaUrl} className={className} muted playsInline />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors duration-300">
-          <PlayCircle size={iconSize} className="text-white drop-shadow-md" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors duration-300">
+          <div className="w-12 h-12 bg-[#da1e28] text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 pl-0.5">
+            <Play size={22} fill="currentColor" className="text-white" />
+          </div>
         </div>
       </div>
     );
@@ -71,15 +82,24 @@ interface NewsSectionProps {
   setSection?: (section: string) => void;
   selectedPost?: NewsPost | null;
   setSelectedPost?: (post: NewsPost | null) => void;
+  heroBanner?: string;
 }
 
-export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPosts, setSection, selectedPost, setSelectedPost }) => {
+export const NewsSection: React.FC<NewsSectionProps> = ({ 
+  category, 
+  posts, 
+  setPosts, 
+  setSection, 
+  selectedPost, 
+  setSelectedPost,
+  heroBanner
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All News');
   const [sortBy, setSortBy] = useState<'Latest' | 'Oldest'>('Latest');
-  const [currentPage, setCurrentPage] = useState(1);
   const [visibleCount, setVisibleCount] = useState(6);
+  const [showShareToast, setShowShareToast] = useState(false);
 
   // Categories list
   const categories = useMemo(() => [
@@ -93,7 +113,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
     'Scholarship'
   ], []);
 
-  // Synchronize category prop from App.tsx/Header.tsx selection
+  // Sync category prop with selection from App header menus
   React.useEffect(() => {
     if (category) {
       if (category === 'News') {
@@ -108,14 +128,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
     }
     setSearchQuery('');
     setAppliedSearch('');
-    setCurrentPage(1);
   }, [category, categories]);
 
   // Filter and Search logic
   const filteredPosts = useMemo(() => {
     let result = [...posts];
 
-    // Filter by fileType if Videos or Pictures are selected under News & Media Menu
+    // Filter by fileType if Videos or Pictures are selected
     if (category === 'Videos') {
       result = result.filter(post => post.fileType === 'video');
     } else if (category === 'Pictures') {
@@ -144,33 +163,32 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
     });
 
     return result;
-  }, [posts, selectedCategory, appliedSearch, sortBy]);
+  }, [posts, selectedCategory, appliedSearch, sortBy, category]);
 
-  // Featured Post (Romania Student Visa 2026 or fallback first featured/latest)
-  const featuredPost = useMemo(() => {
-    const featured = posts.find(post => post.isFeatured);
-    if (featured) return featured;
-    return posts[0] || null;
-  }, [posts]);
+  // Calculate first post to render as Hero (only under All News & when not searching)
+  const isHeroActive = !appliedSearch && selectedCategory === 'All News';
+  const heroPost = useMemo(() => {
+    if (filteredPosts.length > 0) {
+      const featured = filteredPosts.find(post => post.isFeatured);
+      return featured || filteredPosts[0];
+    }
+    return null;
+  }, [filteredPosts]);
 
-  // Trending Now posts list
+  // Posts list for the grid (excluding the hero post if it is active)
+  const gridPosts = useMemo(() => {
+    if (isHeroActive && heroPost) {
+      return filteredPosts.filter(p => p.id !== heroPost.id);
+    }
+    return filteredPosts;
+  }, [filteredPosts, isHeroActive, heroPost]);
+
+  // Trending / Recent Posts list for the sidebar
   const trendingPosts = useMemo(() => {
     return posts.slice(0, 5);
   }, [posts]);
 
-  // Popular Tags
-  const popularTags = [
-    '#Romania', 
-    '#Cyprus', 
-    '#Serbia', 
-    '#StudentVisa', 
-    '#WorkPermit', 
-    '#Admission', 
-    '#Embassy', 
-    '#Scholarship'
-  ];
-
-  // Category count mapping for sidebar
+  // Category count mapping for sidebar and tabs
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { 'All News': posts.length };
     posts.forEach(post => {
@@ -179,39 +197,37 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
     return counts;
   }, [posts]);
 
+  // Category Icon Mapping
+  const getCategoryIcon = (cat: string) => {
+    switch (cat) {
+      case 'All News': return <Newspaper size={14} />;
+      case 'Visa Update': return <Bell size={14} />;
+      case 'Student Visa': return <BookOpen size={14} />;
+      case 'Work Permit': return <Award size={14} />;
+      case 'Embassy Notice': return <Globe size={14} />;
+      case 'Success Story': return <Sparkles size={14} />;
+      case 'Admission': return <Check size={14} />;
+      case 'Scholarship': return <TrendingUp size={14} />;
+      default: return <Tag size={14} />;
+    }
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setAppliedSearch(searchQuery);
-    setCurrentPage(1);
   };
 
   const handleCategoryClick = (cat: string) => {
     setSelectedCategory(cat);
-    setCurrentPage(1);
-    setSelectedPost(null);
+    if (setSelectedPost) {
+      setSelectedPost(null);
+    }
   };
-
-  const handleTagClick = (tag: string) => {
-    const cleanTag = tag.replace('#', '');
-    setSearchQuery(cleanTag);
-    setAppliedSearch(cleanTag);
-    setSelectedCategory('All News');
-    setCurrentPage(1);
-    setSelectedPost(null);
-  };
-
-  // Pagination configuration
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
-  const paginatedPosts = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredPosts.slice(start, start + itemsPerPage);
-  }, [filteredPosts, currentPage]);
 
   // Navigation handlers for detailed view
   const handleNextArticle = (currentId?: string) => {
     const currentIndex = posts.findIndex(p => p.id === currentId);
-    if (currentIndex !== -1 && currentIndex < posts.length - 1) {
+    if (currentIndex !== -1 && currentIndex < posts.length - 1 && setSelectedPost) {
       setSelectedPost(posts[currentIndex + 1]);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -219,475 +235,560 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ category, posts, setPo
 
   const handlePrevArticle = (currentId?: string) => {
     const currentIndex = posts.findIndex(p => p.id === currentId);
-    if (currentIndex !== -1 && currentIndex > 0) {
+    if (currentIndex !== -1 && currentIndex > 0 && setSelectedPost) {
       setSelectedPost(posts[currentIndex - 1]);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
+  // Safe Social Share URLs construction
+  const getShareLink = (platform: 'facebook' | 'twitter' | 'linkedin' | 'copy') => {
+    const pageUrl = window.location.href;
+    const shareText = selectedPost ? encodeURIComponent(selectedPost.title) : 'Check out this update!';
+    const encodedUrl = encodeURIComponent(pageUrl);
+
+    switch (platform) {
+      case 'facebook':
+        return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+      case 'twitter':
+        return `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
+      case 'linkedin':
+        return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+      default:
+        return '';
+    }
+  };
+
+  const handleCopyLink = () => {
+    const pageUrl = window.location.href;
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      setShowShareToast(true);
+      setTimeout(() => setShowShareToast(false), 3000);
+    }).catch(err => {
+      console.error('Failed to copy link: ', err);
+    });
+  };
+
   return (
-    <div className={`bg-white min-h-screen pb-20 font-sans selection:bg-[#da1e28] selection:text-white`} id="news-section-viewport">
+    <div className="bg-white min-h-screen pb-24 font-sans selection:bg-[#da1e28] selection:text-white" id="news-section-viewport">
       
-      {!selectedPost && (
-        <>
-          {/* 1. Header Banner */}
-          <section className="bg-gradient-to-b from-slate-50 via-blue-50/10 to-white pt-24 pb-14 px-4 md:px-8 border-b border-gray-100 relative overflow-hidden" id="news-header-banner">
-            {/* Background decorative patterns */}
-            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
-            
-            <div className="max-w-7xl mx-auto flex flex-col gap-6 text-left relative z-10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex flex-col gap-2">
-                  <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-none uppercase">
-                    News & <span className="text-[#da1e28]">Updates</span>
-                  </h1>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-100 text-[#da1e28] text-xs font-bold rounded-full w-fit">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#da1e28] animate-pulse"></span>
-                    খবর ও নোটিশ
+      {/* 1. Header Banner matching Home Hero style */}
+      <section 
+        className="relative h-[25vh] min-h-[180px] flex flex-col items-center justify-center text-center px-4 overflow-hidden"
+        id="news-header-banner"
+      >
+        {/* Dynamic Background Image */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroBanner || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2000'})` }}
+          id="news-banner-bg-image"
+        ></div>
+        {/* Deep blue gradient overlay exactly matching home screen */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-900/80 to-blue-950/90 z-0"></div>
+        
+        <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-red-500/15 text-[#da1e28] text-[9px] font-black rounded-sm w-fit tracking-widest uppercase">
+            <span className="w-1 h-1 rounded-full bg-[#da1e28] animate-pulse"></span>
+            News & Updates (বিজ্ঞপ্তি ও নোটিশ)
+          </span>
+          <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none uppercase drop-shadow-2xl">
+            Joy Fast <span className="text-[#da1e28]">Fly Updates</span>
+          </h1>
+        </div>
+      </section>
+
+      {/* 2. Flat (Non-Sticky) Horizontal Category Tabs */}
+      <div className="bg-gray-50 border-b border-gray-200 py-4 px-4 md:px-8" id="category-tabs-static">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            {categories.map((cat) => {
+              const isActive = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryClick(cat)}
+                  className={`flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-wider transition-all duration-300 rounded-sm cursor-pointer shrink-0 border ${
+                    isActive 
+                      ? 'bg-[#da1e28] text-white border-[#da1e28] shadow-sm' 
+                      : 'bg-white text-blue-950 hover:bg-slate-100/60 hover:text-gray-800 border-gray-200'
+                  }`}
+                >
+                  <span className={isActive ? 'text-white' : 'text-[#da1e28]'}>
+                    {getCategoryIcon(cat)}
                   </span>
-                </div>
+                  <span>{cat}</span>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-black ${
+                    isActive ? 'bg-white text-[#da1e28]' : 'bg-slate-100 text-gray-500'
+                  }`}>
+                    {categoryCounts[cat] || 0}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-                {/* Modern search bar container */}
-                <div className="w-full md:max-w-md">
-                  <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-white border border-gray-200 focus-within:border-[#da1e28] focus-within:ring-2 focus-within:ring-red-100 rounded-full pl-4 pr-1.5 py-1.5 shadow-sm hover:shadow-md transition-all duration-300">
-                    <Search size={18} className="text-gray-400 shrink-0 mr-2" />
-                    <input 
-                      type="text" 
-                      placeholder="Search news & circulars..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-transparent text-sm font-semibold text-gray-900 placeholder-gray-400 focus:outline-none"
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery('');
-                          setAppliedSearch('');
-                          setCurrentPage(1);
-                        }}
-                        className="p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors mr-1"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                    <button 
-                      type="submit"
-                      className="bg-[#da1e28] hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shrink-0 cursor-pointer"
-                    >
-                      Search
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+          {/* Quick Search Widget */}
+          <div className="w-full md:max-w-xs">
+            <form onSubmit={handleSearchSubmit} className="relative flex items-center bg-white border border-gray-200 focus-within:border-[#da1e28] rounded-sm pl-3 pr-1 py-1 shadow-xs transition-all duration-300">
+              <Search size={14} className="text-gray-400 shrink-0 mr-1.5" />
+              <input 
+                type="text" 
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent text-xs font-semibold text-blue-950 placeholder-gray-400 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setAppliedSearch('');
+                  }}
+                  className="p-1 text-gray-400 hover:text-[#da1e28] transition-colors mr-1"
+                >
+                  <X size={12} />
+                </button>
+              )}
+              <button 
+                type="submit"
+                className="bg-blue-950 hover:bg-[#da1e28] text-white text-[9px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-sm transition-all shrink-0 cursor-pointer"
+              >
+                Go
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
 
-      {/* 3. Main Dynamic News Engine */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12" id="news-container-grid">
+      {/* 3. Main Body Container */}
+      <main className="max-w-7xl mx-auto px-4 md:px-8 py-10" id="main-content-layout">
         
         {selectedPost ? (
-          /* ======================================================================
-             STATE 3/4: DETAILED POST VIEW (Exactly like mockup screens 3 & 4)
-             ====================================================================== */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 animate-fade-in text-left">
+          /* ==========================================================
+             A. DETAILED POST VIEW (ULTRA CLEAN, EDITORIAL & MINIMAL)
+             ========================================================== */
+          <div className="max-w-2xl mx-auto w-full flex flex-col gap-8 animate-fade-in text-left">
             
-            {/* Left Column (8 cols): Breadcrumb, Big Cover, Meta, Highlights, Table, Body */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
+            {/* Inline success toast notification for copied link */}
+            {showShareToast && (
+              <div className="fixed bottom-5 right-5 bg-blue-950 text-white text-xs font-bold px-4 py-3 rounded-sm shadow-xl border-l-4 border-[#da1e28] z-50 flex items-center gap-2 animate-bounce">
+                <Check size={16} className="text-green-400" />
+                <span>Link copied to clipboard successfully! (লিংক কপি করা হয়েছে)</span>
+              </div>
+            )}
+
+            {/* Navigation back with minimal sleek visual line */}
+            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+              <button 
+                onClick={() => {
+                  if (setSelectedPost) setSelectedPost(null);
+                }}
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-950 hover:text-[#da1e28] transition-colors group cursor-pointer"
+              >
+                <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
+                Back to Updates
+              </button>
               
-              {/* Breadcrumb path */}
-              <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
-                <button onClick={() => { setSelectedPost(null); handleCategoryClick('All News'); }} className="hover:text-[#da1e28] transition-colors">Home</button>
-                <ChevronRight size={12} className="text-gray-300" />
-                <button onClick={() => setSelectedPost(null)} className="hover:text-[#da1e28] transition-colors">News</button>
-                <ChevronRight size={12} className="text-gray-300" />
-                <span className="text-gray-800 truncate max-w-[150px] md:max-w-[200px] font-extrabold">{selectedPost.title}</span>
-              </div>
-
-              {/* Title, Date and Metas */}
-              <div className="flex flex-col gap-4">
-                <span className="inline-flex items-center px-3 py-1 text-[11px] font-black uppercase tracking-wider text-red-600 bg-red-50 border border-red-150/40 rounded-none w-fit">
-                  {selectedPost.category}
-                </span>
-                <h1 className="text-3xl md:text-5xl font-black text-gray-900 leading-tight">
-                  {selectedPost.title}
-                </h1>
-                
-                {/* Author profile + Date + Social share bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4 mt-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-left leading-tight">
-                      <span className="text-sm font-bold text-gray-900">Joy Fast Fly Desk</span>
-                      <span className="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
-                        <Calendar size={12} className="text-[#da1e28]" /> {selectedPost.date} &bull; {selectedPost.readTime || '3 min read'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Share Icons */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">Share:</span>
-                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-[#da1e28] hover:text-[#da1e28] flex items-center justify-center text-gray-400 transition-colors">
-                      <Facebook size={14} />
-                    </a>
-                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-sky-500 hover:text-sky-500 flex items-center justify-center text-gray-400 transition-colors">
-                      <Twitter size={14} />
-                    </a>
-                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-blue-700 hover:text-blue-700 flex items-center justify-center text-gray-400 transition-colors">
-                      <Linkedin size={14} />
-                    </a>
-                    <a href="#" className="w-8 h-8 rounded-none border border-gray-200 hover:border-green-600 hover:text-green-600 flex items-center justify-center text-gray-400 transition-colors">
-                      <MessageCircle size={14} />
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Big Featured Cover Image */}
-              <div className="relative w-full aspect-[16/9] bg-gray-100 mt-2 shadow-sm rounded-none overflow-hidden border border-gray-200">
-                {selectedPost.fileType === 'image' ? (
-                  <img src={selectedPost.mediaUrl} alt={selectedPost.title} className="w-full h-full object-cover" />
-                ) : (() => {
-                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                  const match = selectedPost.mediaUrl?.match(regExp);
-                  const youtubeId = (match && match[2].length === 11) ? match[2] : null;
-                  
-                  const vimeoReg = /vimeo\.com\/(\d+)/;
-                  const vimeoMatch = selectedPost.mediaUrl?.match(vimeoReg);
-                  const vimeoId = vimeoMatch ? vimeoMatch[1] : null;
-
-                  if (youtubeId) {
-                    return (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${youtubeId}`}
-                        title={selectedPost.title}
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    );
-                  } else if (vimeoId) {
-                    return (
-                      <iframe
-                        src={`https://player.vimeo.com/video/${vimeoId}`}
-                        title={selectedPost.title}
-                        className="w-full h-full border-0"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowFullScreen
-                      />
-                    );
-                  } else {
-                    return (
-                      <video src={selectedPost.mediaUrl} controls className="w-full h-full object-cover" />
-                    );
-                  }
-                })()}
-              </div>
-
-              {/* Highlights section (if present) */}
-              {selectedPost.highlights && selectedPost.highlights.length > 0 && (
-                <div className="bg-red-50/40 border-l-4 border-[#da1e28] rounded-none p-6">
-                  <h4 className="font-black text-[#da1e28] text-sm uppercase tracking-wider mb-3">Key Highlights:</h4>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {selectedPost.highlights.map((high, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-xs text-gray-700 font-bold">
-                        <Check size={14} className="text-[#da1e28] mt-0.5 shrink-0" />
-                        <span>{high}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Student details structured layout (Crucial for mockup screen 4) */}
-              {selectedPost.studentDetails && (
-                <div className="bg-gray-50 border-2 border-gray-950 rounded-none p-6 md:p-8 shadow-sm">
-                  <h4 className="font-black text-[#da1e28] text-sm uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">
-                    Student Information (শিক্ষার্থী তথ্য)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6 text-xs">
-                    <div className="flex justify-between border-b border-gray-150 pb-2">
-                      <span className="font-bold text-gray-500 uppercase tracking-wider">Name:</span>
-                      <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.name}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-gray-150 pb-2">
-                      <span className="font-bold text-gray-500 uppercase tracking-wider">Country:</span>
-                      <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.country}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-gray-150 pb-2">
-                      <span className="font-bold text-gray-500 uppercase tracking-wider">Applied For:</span>
-                      <span className="font-black text-[#da1e28] text-right">{selectedPost.studentDetails.appliedFor}</span>
-                    </div>
-                    <div className="flex justify-between border-b border-gray-150 pb-2">
-                      <span className="font-bold text-gray-500 uppercase tracking-wider">Intake:</span>
-                      <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.intake}</span>
-                    </div>
-                    <div className="sm:col-span-2 flex justify-between border-b border-gray-150 pb-2">
-                      <span className="font-bold text-gray-500 uppercase tracking-wider">University:</span>
-                      <span className="font-black text-blue-950 text-right">{selectedPost.studentDetails.university}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Core Description Body text */}
-              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed font-normal whitespace-pre-wrap mt-4">
-                {selectedPost.body}
-              </div>
-
-              {/* Gallery Section (ফটো গ্যালারি) */}
-              <div className="mt-10 pt-8 border-t border-gray-150/80">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1.5 h-6 bg-[#da1e28]"></div>
-                  <h3 className="font-black text-gray-950 text-sm uppercase tracking-widest">
-                    Media Gallery (ফটো গ্যালারি)
-                  </h3>
-                </div>
-                <p className="text-xs font-semibold text-gray-400 mb-4 uppercase">
-                  Moments from our students' journeys and successful visa handovers
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
-                    <img 
-                      src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=600" 
-                      alt="Joy Fast Fly Success" 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
-                    <img 
-                      src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600" 
-                      alt="Joy Fast Fly Campus" 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div className="relative group overflow-hidden rounded-none aspect-video bg-gray-100 border border-gray-200">
-                    <img 
-                      src="https://images.unsplash.com/photo-1568291843233-64e0023a8542?q=80&w=600" 
-                      alt="Joy Fast Fly Student Visa" 
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer navigation for post swapping */}
-              <div className="flex items-center justify-between border-y border-gray-200 py-6 mt-8">
-                <button 
-                  onClick={() => handlePrevArticle(selectedPost.id)}
-                  className="flex items-center gap-3 group hover:text-[#da1e28] transition-colors"
-                >
-                  <ArrowLeft size={18} className="text-gray-400 group-hover:text-[#da1e28] group-hover:-translate-x-1 transition-all" />
-                  <div className="flex flex-col text-left">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Previous News</span>
-                    <span className="font-black text-gray-900 group-hover:text-[#da1e28] transition-colors text-sm">আগের খবর</span>
-                  </div>
-                </button>
-
-                <button 
-                  onClick={() => handleNextArticle(selectedPost.id)}
-                  className="flex items-center gap-3 group hover:text-[#da1e28] transition-colors text-right"
-                >
-                  <div className="flex flex-col text-right">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Next News</span>
-                    <span className="font-black text-gray-900 group-hover:text-[#da1e28] transition-colors text-sm">পরবর্তী খবর</span>
-                  </div>
-                  <ArrowRight size={18} className="text-gray-400 group-hover:text-[#da1e28] group-hover:translate-x-1 transition-all" />
-                </button>
-              </div>
-
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                Published in {selectedPost.category}
+              </span>
             </div>
 
-            {/* Right Column (4 cols) */}
-            <div className="lg:col-span-4 flex flex-col gap-10">
+            {/* Premium Header */}
+            <div className="flex flex-col gap-4">
+              <h1 className="text-3xl md:text-5xl font-black text-blue-950 tracking-tight leading-tight">
+                {selectedPost.title}
+              </h1>
+
+              {/* Minimal Meta details with Left Accent Border */}
+              <div className="flex items-center gap-4 text-xs text-gray-500 font-bold border-l-2 border-[#da1e28] pl-3 py-1">
+                <span>{selectedPost.date}</span>
+                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                <span>By {selectedPost.author || 'Joy Fast Fly Editorial'}</span>
+                {selectedPost.readTime && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                    <span>{selectedPost.readTime}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Main Full-Width Featured Cover Image / Video with beautiful subtle shadow */}
+            <div className="relative w-full aspect-[16/10] bg-slate-100 rounded-sm overflow-hidden border border-gray-150">
+              {selectedPost.fileType === 'image' ? (
+                <img 
+                  src={selectedPost.mediaUrl} 
+                  alt={selectedPost.title} 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer"
+                />
+              ) : (() => {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = selectedPost.mediaUrl?.match(regExp);
+                const youtubeId = (match && match[2].length === 11) ? match[2] : null;
+                
+                const vimeoReg = /vimeo\.com\/(\d+)/;
+                const vimeoMatch = selectedPost.mediaUrl?.match(vimeoReg);
+                const vimeoId = vimeoMatch ? vimeoMatch[1] : null;
+
+                if (youtubeId) {
+                  return (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1`}
+                      title={selectedPost.title}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                } else if (vimeoId) {
+                  return (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1`}
+                      title={selectedPost.title}
+                      className="w-full h-full border-0"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                } else {
+                  return (
+                    <video src={selectedPost.mediaUrl} controls autoPlay muted className="w-full h-full object-cover" />
+                  );
+                }
+              })()}
+            </div>
+
+            {/* Body Content with dynamic formatting & clean spacing */}
+            <div className="text-slate-800 text-base md:text-lg leading-relaxed whitespace-pre-line font-medium font-sans">
+              {selectedPost.body}
+            </div>
+
+            {/* Highlights bullet section rendered as clean minimal quotes block (only if highlights exist) */}
+            {selectedPost.highlights && selectedPost.highlights.length > 0 && (
+              <div className="border-t border-b border-gray-150 py-6 my-2">
+                <span className="text-[10px] font-black text-[#da1e28] uppercase tracking-widest block mb-4">
+                  Key Circular Takeaways:
+                </span>
+                <ul className="flex flex-col gap-3">
+                  {selectedPost.highlights.map((highlight, index) => (
+                    <li key={index} className="flex items-start gap-3 text-sm text-slate-800 font-bold leading-relaxed">
+                      <span className="w-1.5 h-1.5 bg-[#da1e28] rounded-full mt-2 shrink-0"></span>
+                      <span>{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Sleek bottom actions containing Share & Navigation */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-t border-gray-150 pt-8 mt-4">
               
-              {/* Category Counts Widget */}
-              <div className="bg-white">
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
-                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
-                    Categories
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-2.5">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleCategoryClick(cat)}
-                      className={`flex items-center justify-between py-2 border-b border-gray-150 last:border-0 transition-all cursor-pointer ${
-                        selectedCategory === cat
-                          ? 'text-[#da1e28] font-black'
-                          : 'text-gray-700 font-bold hover:text-[#da1e28]'
-                      }`}
-                    >
-                      <span className="text-sm">{cat}</span>
-                      <span className="text-xs text-gray-400">
-                        ({categoryCounts[cat] || 0})
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Related News / Trending Now Sidebar */}
-              <div className="bg-white">
-                <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-5">
-                  <h3 className="font-black text-gray-950 text-xs uppercase tracking-widest">
-                    Related News
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-4">
-                  {trendingPosts.map((post, index) => (
-                    <div 
-                      key={post.id || index}
-                      onClick={() => setSelectedPost(post)}
-                      className="flex gap-4 cursor-pointer group items-start pb-4 border-b border-gray-100 last:border-0"
-                    >
-                      <div className="w-24 h-16 shrink-0 bg-gray-100 overflow-hidden relative border border-gray-200 rounded-none">
-                        <MediaPreview post={post} iconSize={18} />
-                      </div>
-                      <div className="flex flex-col flex-1">
-                        <span className="text-[10px] text-[#da1e28] font-black mb-1 font-mono">{post.date}</span>
-                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
-                          {post.title}
-                        </h4>
-                      </div>
-                    </div>
-                  ))}
+              {/* Working active direct platform links */}
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Share Update:</span>
+                <div className="flex items-center gap-1.5">
+                  <a 
+                    href={getShareLink('facebook')} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-9 h-9 rounded-sm border border-gray-200 hover:border-[#da1e28] hover:bg-red-50 hover:text-[#da1e28] flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                    title="Share on Facebook"
+                  >
+                    <Facebook size={14} />
+                  </a>
+                  <a 
+                    href={getShareLink('twitter')} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-9 h-9 rounded-sm border border-gray-200 hover:border-sky-500 hover:bg-sky-50 hover:text-sky-500 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                    title="Share on Twitter"
+                  >
+                    <Twitter size={14} />
+                  </a>
+                  <a 
+                    href={getShareLink('linkedin')} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-9 h-9 rounded-sm border border-gray-200 hover:border-blue-700 hover:bg-blue-50 hover:text-blue-700 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                    title="Share on LinkedIn"
+                  >
+                    <Linkedin size={14} />
+                  </a>
+                  <button 
+                    onClick={handleCopyLink}
+                    className="w-9 h-9 rounded-sm border border-gray-200 hover:border-green-600 hover:bg-green-50 hover:text-green-600 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                    title="Copy link to clipboard"
+                  >
+                    <Link2 size={14} />
+                  </button>
                 </div>
               </div>
 
-              {/* Counselor Help Profile Card */}
-              <div className="bg-gray-50 border-2 border-gray-950 p-6 flex flex-col gap-4">
-                <div className="relative w-full h-44 overflow-hidden bg-gray-200 border border-gray-300 rounded-none">
-                  <img 
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400" 
-                    alt="Joy Fast Fly Expert" 
-                    className="w-full h-full object-cover object-top mix-blend-multiply" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-3 left-3 text-xs font-black text-white uppercase tracking-wider font-mono">
-                    Senior Counselor
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2 text-left mt-2">
-                  <h3 className="font-black text-gray-900 text-lg leading-tight">
-                    Need Help with Visa Process?
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                    Our expert team is ready to guide you step-by-step through the process.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSection?.('contact')}
-                  className="w-full bg-[#da1e28] hover:bg-red-700 text-white py-3.5 px-4 text-xs font-black uppercase tracking-widest transition-colors mt-2 rounded-none cursor-pointer"
+              {/* Prev / Next controls */}
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => handlePrevArticle(selectedPost.id)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 text-blue-950 text-[10px] font-black uppercase tracking-wider rounded-sm border border-gray-200 transition-all cursor-pointer group"
                 >
-                  Contact Now
+                  <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5" /> Previous
+                </button>
+                <button 
+                  onClick={() => handleNextArticle(selectedPost.id)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-[#da1e28] hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-wider rounded-sm border border-[#da1e28] transition-all cursor-pointer group"
+                >
+                  Next <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
                 </button>
               </div>
-
             </div>
 
           </div>
         ) : (
-          /* ======================================================================
-             DEFAULT VIEW: COMPACT GRID OF NEWS ITEMS (Removed sidebars/featured headers)
-             ====================================================================== */
-          <div className="flex flex-col gap-8">
-            {/* Sorting, count and Search result status */}
-            <div className="flex items-center justify-between flex-wrap gap-4 border-b border-gray-100 pb-4">
-              <div className="flex flex-col gap-1 text-left">
-                <h2 className="text-xl font-black text-gray-950 tracking-tight uppercase">
-                  {selectedCategory !== 'All News' ? selectedCategory : 'News & Circulars'}
-                </h2>
-                {appliedSearch && (
-                  <p className="text-xs font-semibold text-gray-400">
-                    Search results for: <span className="text-[#da1e28]">"{appliedSearch}"</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Sorting selector */}
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'Latest' | 'Oldest')}
-                  className="border-2 border-gray-950 text-[10px] font-black text-gray-950 rounded-none px-3 py-1.5 bg-white focus:outline-none cursor-pointer"
+          /* ==========================================================
+             B. DYNAMIC FEED VIEW (HERO CARD & FEEDS LIST WITH SIDEBAR)
+             ========================================================== */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+            
+            {/* LEFT 8 COLUMNS: List Feed */}
+            <div className="lg:col-span-8 flex flex-col gap-8 text-left">
+              
+              {/* Featured Hero Card */}
+              {isHeroActive && heroPost && (
+                <div 
+                  onClick={() => {
+                    if (setSelectedPost) setSelectedPost(heroPost);
+                  }}
+                  className="bg-white border border-gray-200 hover:border-gray-300 rounded-sm overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300 cursor-pointer group relative flex flex-col md:flex-row min-h-[280px]"
+                  id="news-featured-hero-card"
                 >
-                  <option value="Latest">LATEST</option>
-                  <option value="Oldest">OLDEST</option>
-                </select>
-              </div>
-            </div>
+                  {/* Visual Badge */}
+                  <div className="absolute top-3 left-3 z-10 flex gap-2">
+                    <span className="px-2.5 py-1 bg-[#da1e28] text-white text-[8px] font-black uppercase tracking-widest rounded-sm flex items-center gap-1 shadow-md">
+                      <Sparkles size={10} fill="currentColor" /> FEATURED UPDATE
+                    </span>
+                  </div>
 
-            {filteredPosts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPosts.slice(0, visibleCount).map((post) => (
-                  <div
-                    key={post.id}
-                    onClick={() => {
-                      if (setSelectedPost) {
-                        setSelectedPost(post);
-                      }
-                    }}
-                    className="flex flex-col bg-white border border-gray-200 group cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5 duration-300 text-left overflow-hidden h-full"
-                  >
-                    {/* Compact Image */}
-                    <div className="w-full h-40 relative overflow-hidden bg-gray-50 border-b border-gray-150 shrink-0">
-                      <MediaPreview post={post} iconSize={20} />
+                  {/* Media Column */}
+                  <div className="w-full md:w-5/12 relative bg-slate-950 overflow-hidden shrink-0 aspect-video md:aspect-auto">
+                    <MediaPreview post={heroPost} />
+                    <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-blue-950/60 via-blue-950/10 to-transparent"></div>
+                  </div>
+
+                  {/* Content Column */}
+                  <div className="w-full md:w-7/12 p-5 md:p-6 flex flex-col justify-between gap-3">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[9px] font-black text-[#da1e28] uppercase tracking-widest">
+                        {heroPost.category}
+                      </span>
+                      
+                      <h2 className="text-base md:text-lg font-black text-blue-950 group-hover:text-[#da1e28] transition-colors leading-tight">
+                        {heroPost.title}
+                      </h2>
+                      
+                      <p className="text-slate-600 text-xs font-semibold line-clamp-3 leading-relaxed">
+                        {heroPost.body}
+                      </p>
                     </div>
 
-                    {/* Content Area */}
-                    <div className="flex flex-col p-4 flex-grow justify-between">
-                      <div>
-                        <span className="text-[9px] font-black text-[#da1e28] uppercase tracking-widest font-mono block mb-1">
-                          {post.category}
-                        </span>
-                        <h3 className="text-sm font-black text-gray-900 group-hover:text-[#da1e28] transition-colors leading-snug line-clamp-2">
-                          {post.title}
-                        </h3>
-                        <p className="text-gray-500 text-xs mt-2 line-clamp-2 leading-relaxed font-medium">
-                          {post.body}
-                        </p>
+                    {/* Footer Details */}
+                    <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-1">
+                      <div className="flex items-center gap-1.5 text-slate-500 font-bold text-[10px]">
+                        <Calendar size={11} className="text-[#da1e28]" />
+                        <span>{heroPost.date}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-sky-600 font-bold mt-4 pt-3 border-t border-gray-50">
-                        <Calendar size={13} className="shrink-0" />
-                        <span className="text-[10px] uppercase tracking-wider font-mono">
-                          {post.date}
+                      <span className="text-[#da1e28] text-[10px] font-black uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                        Read News <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Grid Subtitle */}
+              <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-5 bg-[#da1e28] rounded-sm"></span>
+                  <h2 className="text-xs font-black text-blue-950 uppercase tracking-widest">
+                    {selectedCategory === 'All News' 
+                      ? (appliedSearch ? 'Search Results' : 'Latest Stories') 
+                      : `${selectedCategory} Circulars`
+                    }
+                  </h2>
+                </div>
+
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  Showing {gridPosts.length} post{gridPosts.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {/* Main News Circular Grid - 3-Column Compact/Simple Design */}
+              {gridPosts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                  {gridPosts.slice(0, visibleCount).map((post) => (
+                    <div
+                      key={post.id}
+                      onClick={() => {
+                        if (setSelectedPost) setSelectedPost(post);
+                      }}
+                      className="bg-white border border-gray-150 hover:border-gray-350 rounded-sm overflow-hidden shadow-xs hover:shadow-sm transition-all duration-300 cursor-pointer group flex flex-col h-full"
+                    >
+                      {/* Compact Cover */}
+                      <div className="w-full h-36 bg-slate-950 relative overflow-hidden shrink-0">
+                        <MediaPreview post={post} />
+                        <span className="absolute top-2.5 left-2.5 px-2 py-0.5 bg-blue-950/90 text-white text-[8px] font-black uppercase tracking-wider rounded-sm">
+                          {post.category}
+                        </span>
+                      </div>
+
+                      {/* Text Block */}
+                      <div className="p-4 flex flex-col justify-between flex-grow text-left">
+                        <div className="flex flex-col gap-1.5">
+                          <h3 className="text-xs sm:text-sm font-black text-blue-950 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
+                            {post.title}
+                          </h3>
+                          <p className="text-slate-500 text-[11px] line-clamp-2 leading-relaxed font-semibold">
+                            {post.body}
+                          </p>
+                        </div>
+
+                        {/* Footer and Date */}
+                        <div className="flex items-center justify-between border-t border-slate-100 pt-3 mt-4 text-[10px]">
+                          <div className="flex items-center gap-1 text-gray-400 font-bold">
+                            <Calendar size={11} className="text-[#da1e28]" />
+                            <span>{post.date}</span>
+                          </div>
+
+                          <span className="text-[#da1e28] font-black uppercase tracking-wider flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                            Read <ArrowRight size={10} />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* EMPTY STATE FILTER FAIL */
+                <div className="bg-white border border-gray-200 py-16 px-4 text-center rounded-sm shadow-xs flex flex-col items-center justify-center gap-4">
+                  <div className="w-14 h-14 bg-red-50 text-[#da1e28] rounded-sm flex items-center justify-center mb-1">
+                    <Newspaper size={26} />
+                  </div>
+                  <p className="text-blue-950 text-sm font-black uppercase tracking-wider">
+                    কোনো নোটিশ বা পোস্ট পাওয়া যায়নি।
+                  </p>
+                  <p className="text-gray-400 text-xs max-w-sm -mt-2">
+                    No updates match your active filters or keywords. Reset search query to read our latest releases.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setSearchQuery('');
+                      setAppliedSearch('');
+                      setSelectedCategory('All News');
+                    }}
+                    className="mt-2 px-6 py-2.5 bg-blue-950 text-white text-xs font-black uppercase tracking-widest rounded-sm hover:bg-[#da1e28] transition-all cursor-pointer"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
+              )}
+
+              {/* Load More Button Trigger */}
+              {visibleCount < gridPosts.length && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 6)}
+                    className="px-8 py-3.5 bg-blue-950 hover:bg-[#da1e28] text-white text-xs font-black uppercase tracking-widest rounded-sm shadow-md hover:-translate-y-0.5 transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    Load More Updates (পরবর্তী আপডেট) <ArrowRight size={14} />
+                  </button>
+                </div>
+              )}
+
+            </div>
+
+            {/* RIGHT 4 COLUMNS: UNIFIED SIDEBAR */}
+            <aside className="lg:col-span-4 flex flex-col gap-8">
+              
+              {/* Recent Circulars / Related News ticker */}
+              <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-xs text-left">
+                <h3 className="font-black text-blue-950 text-xs uppercase tracking-widest border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#da1e28] rounded-sm"></span>
+                  Trending Circulars
+                </h3>
+                
+                <div className="flex flex-col gap-4">
+                  {trendingPosts.map((post, index) => (
+                    <div 
+                      key={post.id || index}
+                      onClick={() => {
+                        if (setSelectedPost) {
+                          setSelectedPost(post);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                      }}
+                      className="flex gap-3 cursor-pointer group items-start pb-3.5 border-b border-slate-100 last:border-0 last:pb-0"
+                    >
+                      <div className="w-20 h-14 shrink-0 bg-slate-950 overflow-hidden relative border border-gray-100 rounded-sm shadow-xs">
+                        <MediaPreview post={post} />
+                      </div>
+                      
+                      <div className="flex flex-col flex-1 justify-between min-h-[56px]">
+                        <h4 className="text-xs font-black text-blue-950 group-hover:text-[#da1e28] transition-colors line-clamp-2 leading-snug">
+                          {post.title}
+                        </h4>
+                        <span className="text-[9px] text-gray-400 font-extrabold flex items-center gap-1 mt-1 uppercase">
+                          <Calendar size={10} className="text-[#da1e28]" /> {post.date}
                         </span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div className="bg-white border border-gray-200 py-16 text-center rounded-none shadow-sm">
-                <p className="text-gray-950 text-sm font-black uppercase tracking-wider font-mono">
-                  কোনো ফলাফল পাওয়া যায়নি। (No news posts match your filter criteria)
-                </p>
-              </div>
-            )}
 
-            {/* Load More Controller */}
-            {visibleCount < filteredPosts.length && (
-              <div className="flex justify-center mt-6">
+              {/* Support / Counselor Help Card */}
+              <div className="bg-blue-950 border border-blue-900 text-white rounded-sm p-6 shadow-md text-left relative overflow-hidden">
+                <div className="absolute right-0 top-0 w-32 h-32 bg-[#da1e28]/5 rounded-full translate-x-10 -translate-y-10"></div>
+                
+                <div className="relative w-full h-44 overflow-hidden bg-blue-900 border border-blue-800 rounded-sm mb-4">
+                  <img 
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400" 
+                    alt="Joy Fast Fly Counselor" 
+                    className="w-full h-full object-cover object-top mix-blend-luminosity" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-transparent to-transparent"></div>
+                  <span className="absolute bottom-3 left-3 text-[9px] font-black text-white bg-[#da1e28] px-2.5 py-1 rounded-sm uppercase tracking-wider">
+                    Senior Counselor Desk
+                  </span>
+                </div>
+                
+                <div className="flex flex-col gap-2 mt-2">
+                  <h3 className="font-black text-white text-base leading-tight">
+                    Need Help with Visa Process?
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed font-semibold">
+                    Get absolute transparency, free step-by-step document review, and guidance directly from experts.
+                  </p>
+                </div>
+                
                 <button
-                  onClick={() => setVisibleCount(prev => prev + 6)}
-                  className="px-8 py-3 bg-[#da1e28] hover:bg-red-700 text-white text-xs font-black uppercase tracking-widest rounded-none shadow-md hover:shadow-lg transition-all cursor-pointer"
+                  onClick={() => {
+                    if (setSection) setSection('contact');
+                  }}
+                  className="w-full bg-[#da1e28] hover:bg-red-700 text-white py-3 px-4 text-[10px] font-black uppercase tracking-widest transition-all mt-4 rounded-sm cursor-pointer shadow-lg"
                 >
-                  Load More News
+                  Contact Desk
                 </button>
               </div>
-            )}
+
+            </aside>
+
           </div>
         )}
-      </div>
+
+      </main>
+
     </div>
   );
 };

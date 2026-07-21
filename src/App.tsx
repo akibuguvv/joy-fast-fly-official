@@ -62,19 +62,24 @@ export default function App() {
 
         if (newsData && newsData.length > 0) {
           setSharedPosts(newsData.map((item: any) => {
+            const getValue = (camelKey: string, snakeKey: string, fallback: any = undefined) => {
+              const val = item[camelKey] !== undefined && item[camelKey] !== null ? item[camelKey] : item[snakeKey];
+              return val !== undefined && val !== null ? val : fallback;
+            };
+
             const mappedItem = {
-              id: item.id !== undefined ? String(item.id) : undefined,
+              id: item.id !== undefined && item.id !== null ? String(item.id) : undefined,
               title: item.title,
               body: item.body,
-              mediaUrl: item.mediaUrl !== undefined ? item.mediaUrl : (item.media_url !== undefined ? item.media_url : ''),
+              mediaUrl: getValue('mediaUrl', 'media_url', ''),
               date: item.date,
-              fileType: item.fileType !== undefined ? item.fileType : (item.file_type !== undefined ? item.file_type : 'image'),
+              fileType: getValue('fileType', 'file_type', 'image'),
               category: item.category,
-              readTime: item.readTime !== undefined ? item.readTime : (item.read_time !== undefined ? item.read_time : undefined),
+              readTime: getValue('readTime', 'read_time'),
               author: item.author,
-              isFeatured: item.isFeatured !== undefined ? item.isFeatured : (item.is_featured !== undefined ? item.is_featured : undefined),
+              isFeatured: getValue('isFeatured', 'is_featured'),
               highlights: item.highlights,
-              studentDetails: item.studentDetails !== undefined ? item.studentDetails : (item.student_details !== undefined ? item.student_details : undefined)
+              studentDetails: getValue('studentDetails', 'student_details')
             };
 
             let parsedHighlights: any[] = [];
@@ -258,7 +263,7 @@ export default function App() {
       case 'admin':
         return <AdminPanelSection posts={sharedPosts} setPosts={setSharedPosts} setSection={setSection} />;
       case 'news':
-        return <NewsSection category={newsCategory} posts={sharedPosts} setPosts={setSharedPosts} setSection={setSection} selectedPost={selectedPost} setSelectedPost={setSelectedPost} />;
+        return <NewsSection category={newsCategory} posts={sharedPosts} setPosts={setSharedPosts} setSection={setSection} selectedPost={selectedPost} setSelectedPost={setSelectedPost} heroBanner={siteSettings.hero_banner_url} />;
       default:
         return <HomeSection setSection={setSection} posts={sharedPosts} setSelectedPost={setSelectedPost} />;
     }
