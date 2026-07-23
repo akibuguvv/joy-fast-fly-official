@@ -393,27 +393,33 @@ export const ContactSection: React.FC = () => {
                   <div className="flex flex-col gap-1 min-w-0 w-full">
                     <span className="text-[9px] text-gray-400 uppercase tracking-wider font-black">CALL & WHATSAPP</span>
                     <div className="flex flex-col gap-2 mt-1 w-full">
-                      <div className="flex items-center justify-between gap-2 p-2 bg-red-50/40 border border-red-100/50">
-                        <div className="flex flex-col">
-                          <span className="text-[8px] text-red-500 font-black uppercase">মোহাম্মদ আতিক মোল্লা (ডিরেক্টর)</span>
-                          <a href="tel:+8801746983358" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
-                            +880 1746-983358
-                          </a>
+                      <div className="flex flex-col gap-2 p-2 bg-red-50/40 border border-red-100/50">
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-[#da1e28]" />
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[8px] text-red-500 font-black uppercase">MD ATIKUR RAHMAN - Director</span>
+                            <a href="tel:+8801746983358" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
+                              +880 1746-983358
+                            </a>
+                          </div>
                         </div>
-                        <a href="tel:+8801746983358" className="px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
-                          Call
+                        <a href="tel:+8801746983358" className="w-full text-center px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
+                          Call Now
                         </a>
                       </div>
 
-                      <div className="flex items-center justify-between gap-2 p-2 bg-red-50/40 border border-red-100/50">
-                        <div className="flex flex-col">
-                          <span className="text-[8px] text-red-500 font-black uppercase">এবিএম মশিউর রহমান (ডিরেক্টর)</span>
-                          <a href="tel:01944554355" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
-                            01944-554355
-                          </a>
+                      <div className="flex flex-col gap-2 p-2 bg-red-50/40 border border-red-100/50">
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-[#da1e28]" />
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[8px] text-red-500 font-black uppercase">ABM Mashiur Rahman - Director</span>
+                            <a href="tel:01944554355" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
+                              01944-554355
+                            </a>
+                          </div>
                         </div>
-                        <a href="tel:01944554355" className="px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
-                          Call
+                        <a href="tel:01944554355" className="w-full text-center px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
+                          Call Now
                         </a>
                       </div>
 

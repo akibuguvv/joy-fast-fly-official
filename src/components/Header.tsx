@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5 hover:text-red-300 transition-colors">
             <Phone size={12} className="text-[#da1e28]" />
-            <a href="tel:+8801746983358">01746-983358 (আতিক)</a>, <a href="tel:+8801944554355">01944-554355 (মশিউর)</a>
+            <a href="tel:+8801746983358">01746-983358 MD ATIKUR RAHMAN</a>, <a href="tel:+8801944554355">01944-554355 ABM Mashiur Rahman</a>
           </span>
           <span className="flex items-center gap-1.5 hover:text-red-300 transition-colors border-l border-blue-800 pl-4">
             <Mail size={12} className="text-[#da1e28]" />
@@ -259,10 +259,10 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex flex-col gap-2">
                 <a href="tel:+8801746983358" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">
                   <Phone size={16} className="text-[#da1e28]" />
-                  <span>01746-983358 (আতিক)</span>
+                  <span>01746-983358 MD ATIKUR RAHMAN</span>
                 </a>
                 <a href="tel:+8801944554355" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28] ml-6">
-                  <span>01944-554355 (মশিউর)</span>
+                  <span>01944-554355 ABM Mashiur Rahman</span>
                 </a>
               </div>
               <a href="https://wa.me/4531875125" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-950 hover:text-[#da1e28]">

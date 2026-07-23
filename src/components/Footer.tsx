@@ -95,8 +95,8 @@ export const Footer: React.FC<FooterProps> = ({ setSection }) => {
               <Phone size={18} className="text-[#da1e28] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-1">
                 <span>Hotline:</span>
-                <a href="tel:+8801746983358" className="hover:text-red-300 transition-colors font-bold">01746-983358 (আতিক)</a>
-                <a href="tel:+8801944554355" className="hover:text-red-300 transition-colors font-bold">01944-554355 (মশিউর)</a>
+                <a href="tel:+8801746983358" className="hover:text-red-300 transition-colors font-bold">01746-983358 MD ATIKUR RAHMAN</a>
+                <a href="tel:+8801944554355" className="hover:text-red-300 transition-colors font-bold">01944-554355 ABM Mashiur Rahman</a>
                 <span className="text-xs text-gray-400">CEO WhatsApp: <a href="https://wa.me/4531875125" target="_blank" rel="noreferrer" className="hover:text-red-300 transition-colors font-extrabold">+45 31 87 51 25</a></span>
               </div>
             </li>
