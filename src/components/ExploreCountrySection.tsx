@@ -121,7 +121,7 @@ process to ${countryName}:
 [ ] 7. Completed and Signed Visa Application Form
 
 For any queries, please contact Joy Fast Fly at joyfastfly@gmail.com
-Or call us at: +880 1746-983358, 01944554355
+Or call us at: +8801746983358, +8801944554355
 
 Thank you,
 Joy Fast Fly Team

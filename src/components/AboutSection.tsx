@@ -165,10 +165,10 @@ export const AboutSection: React.FC = () => {
                 <div className="flex flex-col gap-2 text-gray-400">
                   <span className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-lg bg-gray-500/20 flex items-center justify-center font-black text-gray-300 text-[10px]">HL</span>
-                    <span>01746-983358 MD ATIKUR RAHMAN</span>
+                    <span>+8801746983358 MD ATIKUR RAHMAN</span>
                   </span>
                   <span className="flex items-center gap-2 ml-8">
-                    <span>01944-554355 ABM Mashiur Rahman</span>
+                    <span>01944-554355 ABM MASHIUR RAHMAN</span>
                   </span>
                 </div>
               </div>

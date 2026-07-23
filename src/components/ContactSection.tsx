@@ -399,7 +399,7 @@ export const ContactSection: React.FC = () => {
                           <div className="flex flex-col gap-0.5">
                             <span className="text-[8px] text-red-500 font-black uppercase">MD ATIKUR RAHMAN - Director</span>
                             <a href="tel:+8801746983358" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
-                              +880 1746-983358
+                              +8801746983358
                             </a>
                           </div>
                         </div>
@@ -412,13 +412,13 @@ export const ContactSection: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <Phone size={14} className="text-[#da1e28]" />
                           <div className="flex flex-col gap-0.5">
-                            <span className="text-[8px] text-red-500 font-black uppercase">ABM Mashiur Rahman - Director</span>
-                            <a href="tel:01944554355" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
-                              01944-554355
+                            <span className="text-[8px] text-red-500 font-black uppercase">ABM MASHIUR RAHMAN - Director</span>
+                            <a href="tel:+8801944554355" className="text-xs font-black text-gray-900 hover:text-[#da1e28] transition-colors">
+                              +8801944554355
                             </a>
                           </div>
                         </div>
-                        <a href="tel:01944554355" className="w-full text-center px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
+                        <a href="tel:+8801944554355" className="w-full text-center px-2 py-1 bg-[#da1e28] hover:bg-red-700 text-white text-[8px] font-black uppercase tracking-wider rounded-none transition-colors">
                           Call Now
                         </a>
                       </div>
